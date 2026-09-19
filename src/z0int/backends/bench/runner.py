@@ -11,15 +11,24 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
 
-from z0int.tokenomics_emit import emit_provider_usage
-
 from ..base import DecisionBackend, result_to_dict
+from .analytics import (
+    build_coverage_section,
+    build_decision_analytics,
+    build_paired_comparisons,
+    render_analytics_md,
+)
+from tokenomics.coverage import format_coverage_text
+
 from .contract import BENCH_CONTRACT, BENCH_SCHEMA, CAPABILITIES, ROSTER_CANDIDATES
 from .fixtures import BenchExample, default_fixtures_path, load_fixtures
 from .eligibility import ELIGIBILITY_SCHEMA, enrich_backend_summaries
+from .materialize import compare_rows, materialize_rows
 from .metrics import aggregate_rows, score_example
 from .pareto import build_pareto_report, render_pareto_md
 from .roster import create_backend_for_candidate, probe_candidate, roster_adapter_table
+from .run_manifest import build_run_manifest, write_run_manifest
+from .tokenomics_bridge import BenchTokenomicsSession
 
 
 def _repo_root() -> Path:
@@ -90,34 +99,37 @@ def _answer_dict(result, qid: str) -> dict[str, Any]:
     return {}
 
 
-def _emit_tokenomics_row(*, candidate_id: str, latency_ms: float, diagnostics: dict[str, Any]) -> None:
-    usage = {
-        "input_tokens": diagnostics.get("input_tokens"),
-        "output_tokens": 0,
-        "total_tokens": diagnostics.get("input_tokens"),
-    }
-    emit_provider_usage(
-        harness="z0int",
-        trace_id=f"bench:{candidate_id}:{int(time.time())}",
-        provider="z0int",
-        model=candidate_id,
-        usage={k: v for k, v in usage.items() if v is not None},
-        role="decision_backend",
-        latency_ms=latency_ms,
-        extra={"bench_contract": BENCH_CONTRACT},
-    )
-
-
 def run_candidate(
     candidate_id: str,
     examples: list[BenchExample],
     *,
+    tm_session: BenchTokenomicsSession,
     backend_factory: Callable[[str], DecisionBackend] | None = None,
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     status = probe_candidate(candidate_id)
     rows: list[dict[str, Any]] = []
     if status.status != "available":
         for ex in examples:
+            trace_id, task_span = tm_session.begin_trace(
+                ex,
+                candidate_id=candidate_id,
+                commercial_use=status.commercial_use,
+                platforms=status.platforms,
+                backend_impl=status.backend_impl,
+                device=None,
+                model_revision=None,
+                input_bytes=_input_size(ex),
+            )
+            tm_session.emit_unavailable(
+                trace_id=trace_id,
+                task_span_id=task_span,
+                example=ex,
+                candidate_id=candidate_id,
+                reason=status.reason or "unavailable",
+                commercial_use=status.commercial_use,
+                platforms=status.platforms,
+                backend_impl=status.backend_impl,
+            )
             rows.append(
                 {
                     "schema": "z0int.backends_bench.row.v1",
@@ -153,7 +165,20 @@ def run_candidate(
         pass
     startup_ms = (time.perf_counter() - cold_start) * 1000.0
     first = True
+    device = getattr(backend, "device", None)
+    model_revision = getattr(backend, "revision", None)
     for ex in examples:
+        input_bytes = _input_size(ex)
+        trace_id, task_span = tm_session.begin_trace(
+            ex,
+            candidate_id=candidate_id,
+            commercial_use=status.commercial_use,
+            platforms=status.platforms,
+            backend_impl=status.backend_impl,
+            device=str(device) if device is not None else None,
+            model_revision=str(model_revision) if model_revision else None,
+            input_bytes=input_bytes,
+        )
         base = {
             "schema": "z0int.backends_bench.row.v1",
             "contract": BENCH_CONTRACT,
@@ -164,8 +189,8 @@ def run_candidate(
             "commercial_use": status.commercial_use,
             "platforms": list(status.platforms),
             "backend_impl": status.backend_impl,
-            "device": getattr(backend, "device", None),
-            "input_bytes": _input_size(ex),
+            "device": device,
+            "input_bytes": input_bytes,
         }
         try:
             t0 = time.perf_counter()
@@ -176,6 +201,33 @@ def run_candidate(
             if ex.question.type == "boolean":
                 pred = "true" if ans.get("value") is True else "false"
             scored = score_example(ex, probabilities=ans.get("probabilities"), pred=pred)
+            abstain_id = ex.abstain_option_id or "abstain"
+            abstained = pred == abstain_id
+            ram_mb = _ram_mb()
+            vram_mb = _vram_mb()
+            result_dict = result_to_dict(result)
+            tm_session.emit_success(
+                trace_id=trace_id,
+                task_span_id=task_span,
+                example=ex,
+                candidate_id=candidate_id,
+                commercial_use=status.commercial_use,
+                platforms=status.platforms,
+                backend_impl=status.backend_impl,
+                device=str(device) if device is not None else None,
+                model_revision=str(model_revision) if model_revision else None,
+                input_bytes=input_bytes,
+                latency_ms=latency_ms,
+                startup_ms=startup_ms if first else None,
+                ram_mb=ram_mb,
+                vram_mb=vram_mb,
+                prediction=pred,
+                confidence=ans.get("confidence"),
+                abstained=abstained,
+                scored=scored,
+                result_dict=result_dict,
+                input_tokens=(result.diagnostics or {}).get("input_tokens"),
+            )
             row = {
                 **base,
                 "status": "ok",
@@ -183,24 +235,28 @@ def run_candidate(
                 "gold": ex.gold,
                 "latency_ms": latency_ms,
                 "startup_ms": startup_ms if first else None,
-                "ram_mb": _ram_mb(),
-                "vram_mb": _vram_mb(),
+                "ram_mb": ram_mb,
+                "vram_mb": vram_mb,
                 "energy": "unavailable",
                 "energy_reason": "no platform energy counter wired",
                 **scored,
-                "result": result_to_dict(result),
+                "result": result_dict,
             }
             first = False
-            try:
-                _emit_tokenomics_row(
-                    candidate_id=candidate_id,
-                    latency_ms=latency_ms,
-                    diagnostics=result.diagnostics,
-                )
-            except Exception:
-                pass
             rows.append(row)
         except Exception as exc:  # noqa: BLE001
+            tm_session.emit_error(
+                trace_id=trace_id,
+                task_span_id=task_span,
+                example=ex,
+                candidate_id=candidate_id,
+                error_class=type(exc).__name__,
+                reason=str(exc),
+                commercial_use=status.commercial_use,
+                platforms=status.platforms,
+                backend_impl=status.backend_impl,
+                device=str(device) if device is not None else None,
+            )
             rows.append(
                 {
                     **base,
@@ -228,10 +284,12 @@ def run_bench(
     capability_filter: str | None = None,
     output_dir: Path | None = None,
     backend_factory: Callable[[str], DecisionBackend] | None = None,
+    seed: int = 0,
 ) -> dict[str, Any]:
     if contract != BENCH_CONTRACT:
         raise ValueError(f"unsupported contract {contract!r}; only {BENCH_CONTRACT}")
 
+    started_at = datetime.now(timezone.utc)
     examples = load_fixtures(fixtures_path)
     if capability_filter:
         examples = [e for e in examples if e.capability == capability_filter]
@@ -254,17 +312,46 @@ def run_bench(
             if bid not in candidates:
                 candidates.append(bid)
 
-    ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    ts = started_at.strftime("%Y%m%dT%H%M%SZ")
     out_dir = output_dir or (_results_root() / ts)
     out_dir.mkdir(parents=True, exist_ok=True)
+    fixtures_file = fixtures_path or default_fixtures_path()
+    events_path = out_dir / "tokenomics-events.jsonl"
+    tm_session = BenchTokenomicsSession.open(
+        run_id=ts,
+        contract=contract,
+        fixtures_path=fixtures_file,
+        seed=seed,
+        candidates=candidates,
+        events_path=events_path,
+        repo_root=_repo_root(),
+    )
 
-    all_rows: list[dict[str, Any]] = []
+    import os
+
+    device_env = {
+        k: v
+        for k, v in os.environ.items()
+        if k.startswith("Z0INT_") and k.endswith(("_DEVICE", "_USE_GRAPHS"))
+    }
+
+    inline_rows: list[dict[str, Any]] = []
     backend_summaries: list[dict[str, Any]] = []
     for cid in candidates:
-        rows, summary = run_candidate(cid, examples, backend_factory=backend_factory)
-        all_rows.extend(rows)
+        rows, summary = run_candidate(
+            cid,
+            examples,
+            tm_session=tm_session,
+            backend_factory=backend_factory,
+        )
+        inline_rows.extend(rows)
         backend_summaries.append(summary)
         _release_gpu_between_candidates()
+
+    finished_at = datetime.now(timezone.utc)
+    materialized_rows = materialize_rows(tm_session.memory.events)
+    parity_errors = compare_rows(inline_rows, materialized_rows)
+    all_rows = materialized_rows
 
     raw_path = out_dir / "raw.jsonl"
     with raw_path.open("w", encoding="utf-8") as fh:
@@ -283,14 +370,39 @@ def run_bench(
         backend_summaries=enriched_summaries,
         examples=examples,
     )
+
+    analytics = build_decision_analytics(tm_session.memory.events)
+    paired = build_paired_comparisons(tm_session.memory.events)
+    coverage = build_coverage_section(tm_session.memory.events)
+    coverage_text = format_coverage_text(coverage)
+
+    manifest = build_run_manifest(
+        repo_root=_repo_root(),
+        contract=contract,
+        fixtures_path=fixtures_file,
+        candidates=candidates,
+        run_id=ts,
+        started_at=started_at,
+        finished_at=finished_at,
+        device_env=device_env,
+    )
+    write_run_manifest(out_dir / "run-manifest.json", manifest)
+
     summary = {
         "schema": BENCH_SCHEMA,
         "contract": contract,
         "timestamp": ts,
-        "fixtures_path": str(fixtures_path or default_fixtures_path()),
+        "seed": seed,
+        "fixtures_path": str(fixtures_file),
         "capabilities": list(CAPABILITIES),
         "candidates": candidates,
         "adapter_table": roster_adapter_table(),
+        "measurement": {
+            "canonical": "tokenomics-events.jsonl",
+            "materialized": "raw.jsonl",
+            "parity_ok": not parity_errors,
+            "parity_errors": parity_errors[:20],
+        },
         "eligibility": {
             "schema": ELIGIBILITY_SCHEMA,
             "competence_margin": 0.05,
@@ -299,17 +411,33 @@ def run_bench(
         "backends": enriched_summaries,
         "pareto": pareto,
         "aggregate": aggregate_rows(all_rows),
+        "analytics": analytics,
+        "paired_comparisons": paired,
+        "coverage": coverage,
     }
     summary_path = out_dir / "summary.json"
     summary_path.write_text(json.dumps(summary, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     pareto_path = out_dir / "pareto.md"
     pareto_path.write_text(render_pareto_md(pareto) + "\n", encoding="utf-8")
+    analytics_path = out_dir / "analytics.json"
+    analytics_path.write_text(json.dumps(analytics, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    (out_dir / "analytics.md").write_text(
+        render_analytics_md(analytics, coverage_text=coverage_text),
+        encoding="utf-8",
+    )
+    (out_dir / "coverage.json").write_text(json.dumps(coverage, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    (out_dir / "coverage.md").write_text(coverage_text + "\n", encoding="utf-8")
 
     return {
         "ok": True,
         "output_dir": str(out_dir),
+        "tokenomics_events": str(events_path),
+        "run_manifest": str(out_dir / "run-manifest.json"),
         "raw_jsonl": str(raw_path),
         "summary_json": str(summary_path),
         "pareto_md": str(pareto_path),
+        "analytics_json": str(analytics_path),
+        "parity_ok": not parity_errors,
+        "parity_errors": parity_errors,
         "summary": summary,
     }
