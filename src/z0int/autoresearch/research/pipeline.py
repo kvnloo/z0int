@@ -34,6 +34,7 @@ def _emit_research_event(
     model: str | None,
     effort: str | None,
     driver: str,
+    usage: dict[str, Any] | None = None,
     extra: dict[str, Any] | None = None,
 ) -> None:
     from z0int.tokenomics_emit import emit_raw
@@ -52,8 +53,8 @@ def _emit_research_event(
         "proposal_id": proposal_id,
         "duration_ms": duration_ms,
         "selection_policy": "research",
-        # Unknown usage/cost stays UNKNOWN — never invent zeros for research savings.
-        "usage": None,
+        # Pass through provider-reported usage only; never invent cost or token-savings credit.
+        "usage": usage,
         "cost_usd": None,
         "estimated_tokens_avoided": None,
         "measured_tokens_avoided": None,
@@ -237,6 +238,7 @@ def run_research_once(
         model=result.model,
         effort=result.effort,
         driver=driver_name,
+        usage=result.usage,
         extra={"command": result.command, "error": result.error},
     )
     if result.status != "ok" or result.proposal is None:

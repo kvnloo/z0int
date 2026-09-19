@@ -281,6 +281,7 @@ class AgyResearchDriver:
             prop = ResearchProposalV1.from_dict(body)
             prop = validate_proposal(prop, search_space=search_space, champion_knobs=champion_knobs)
             job.path("proposal.json").write_text(json.dumps(prop.to_dict(), indent=2) + "\n", encoding="utf-8")
+            usage_out = usage if isinstance(usage, dict) else None
             return ResearchDriverResult(
                 proposal=prop,
                 status="ok",
@@ -289,6 +290,7 @@ class AgyResearchDriver:
                 effort=str(effort) if effort else None,
                 raw=envelope if isinstance(envelope, dict) else {"envelope": envelope},
                 command=cmd,
+                usage=usage_out,
             )
         except Exception as exc:  # noqa: BLE001
             return ResearchDriverResult(
