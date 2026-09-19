@@ -35,6 +35,11 @@ from .analytics import (
 from .contract import BENCH_CONTRACT, BENCH_SCHEMA, CAPABILITIES, ROSTER_CANDIDATES
 from .eligibility import ELIGIBILITY_SCHEMA, enrich_backend_summaries
 from .fixtures import BenchExample, default_fixtures_path, load_fixtures
+from .bootstrap import (
+    bootstrap_pareto_inclusion,
+    quality_uncertainty,
+    render_bootstrap_md,
+)
 from .materialize import materialize_rows, materialize_trace
 from .metrics import aggregate_rows, score_example
 from .pareto import build_pareto_report, render_pareto_md
@@ -254,6 +259,7 @@ def run_bench(
     output_dir: Path | None = None,
     backend_factory: Callable[[str], DecisionBackend] | None = None,
     seed: int = 0,
+    bootstrap_draws: int = 500,
 ) -> dict[str, Any]:
     if contract != BENCH_CONTRACT:
         raise ValueError(f"unsupported contract {contract!r}; only {BENCH_CONTRACT}")
@@ -344,6 +350,20 @@ def run_bench(
         examples=examples,
     )
 
+    uncertainty = quality_uncertainty(all_rows)
+    bootstrap = bootstrap_pareto_inclusion(
+        all_rows,
+        examples=examples,
+        capabilities=cap_list,
+        backend_summaries=enriched_summaries,
+        n_boot=bootstrap_draws,
+        seed=seed,
+    )
+    for cap, block in (pareto.get("by_capability") or {}).items():
+        boot_cap = (bootstrap.get("by_capability") or {}).get(cap) or {}
+        block["bootstrap_inclusion_probability"] = boot_cap.get("inclusion_probability")
+        block["bootstrap_eligible_probability"] = boot_cap.get("eligible_probability")
+
     analytics = build_decision_analytics(tm_session.memory.events)
     paired = build_paired_comparisons(tm_session.memory.events)
     coverage = build_coverage_section(tm_session.memory.events)
@@ -387,6 +407,8 @@ def run_bench(
         "analytics": analytics,
         "paired_comparisons": paired,
         "coverage": coverage,
+        "uncertainty": uncertainty,
+        "bootstrap_pareto": bootstrap,
     }
     summary_path = out_dir / "summary.json"
     summary_path.write_text(json.dumps(summary, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
@@ -400,6 +422,12 @@ def run_bench(
     )
     (out_dir / "coverage.json").write_text(json.dumps(coverage, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     (out_dir / "coverage.md").write_text(coverage_text + "\n", encoding="utf-8")
+    (out_dir / "bootstrap.json").write_text(json.dumps(bootstrap, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    (out_dir / "uncertainty.json").write_text(json.dumps(uncertainty, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    (out_dir / "bootstrap.md").write_text(
+        render_bootstrap_md(bootstrap, uncertainty=uncertainty),
+        encoding="utf-8",
+    )
 
     return {
         "ok": True,
@@ -410,6 +438,8 @@ def run_bench(
         "summary_json": str(summary_path),
         "pareto_md": str(pareto_path),
         "analytics_json": str(analytics_path),
+        "bootstrap_json": str(out_dir / "bootstrap.json"),
+        "uncertainty_json": str(out_dir / "uncertainty.json"),
         "event_sourced": True,
         "summary": summary,
     }

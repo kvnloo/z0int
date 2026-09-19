@@ -101,6 +101,8 @@ row builder.
 | `analytics.json` / `analytics.md` | Quality, safety, latency, paired comparisons |
 | `coverage.json` / `coverage.md` | Measurement coverage gaps (Tokenomics) |
 | `pareto.md` | Human-readable Pareto report |
+| `bootstrap.json` / `bootstrap.md` | Pareto inclusion probability under fixture resampling |
+| `uncertainty.json` | Accuracy CI + dangerous-false upper bounds |
 
 Install analytics dependency: `pip install -e ".[analytics]"` (pins `agent-tokenomics`).
 

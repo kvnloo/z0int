@@ -180,6 +180,10 @@ def render_pareto_md(report: dict[str, Any]) -> str:
         lines.append(
             f"**Pareto-optimal (eligible only):** {', '.join(optimal) if optimal else '(empty — no eligible candidates)'}"
         )
+        boot = block.get("bootstrap_inclusion_probability") or {}
+        if boot:
+            parts = [f"{bid}={prob:.0%}" for bid, prob in sorted(boot.items(), key=lambda kv: -kv[1])]
+            lines.append(f"**Bootstrap Pareto inclusion:** {', '.join(parts)}")
         excluded = block.get("excluded_unsafe") or []
         if excluded:
             lines.append(f"**Excluded (dangerous false > 0):** {', '.join(excluded)}")
