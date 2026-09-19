@@ -481,6 +481,13 @@ def build_parser() -> argparse.ArgumentParser:
     bee.add_argument("--backend", default="nanojev")
     bee.add_argument("--input", required=True, help="Path to request JSON")
     bee.add_argument("--json", action="store_true", default=True)
+    beb = be_sub.add_parser("bench", help="Pareto benchmark decision backends (decision-capability-v1)")
+    beb.add_argument("--contract", default="decision-capability-v1")
+    beb.add_argument("--backend", default=None, help="Single roster candidate id")
+    beb.add_argument("--capability", default=None, help="Filter to one capability")
+    beb.add_argument("--fixtures", default=None, help="Path to examples.jsonl")
+    beb.add_argument("--output", default=None, help="Output directory (default: results/decision-backends/<ts>)")
+    beb.add_argument("--json", action="store_true")
 
 
     art = sub.add_parser("artifacts", help="Candidate artifact inspect/import/list")
@@ -675,6 +682,29 @@ def _cmd_backends(args: argparse.Namespace) -> int:
         result = backend.evaluate(request)
         payload = result_to_dict(result)
         print(json.dumps(payload, indent=2, default=str))
+        return 0
+
+    if cmd == "bench":
+        from pathlib import Path
+
+        from z0int.backends.bench import run_bench
+
+        out = run_bench(
+            contract=args.contract,
+            fixtures_path=Path(args.fixtures).expanduser() if args.fixtures else None,
+            backend_filter=args.backend,
+            capability_filter=args.capability,
+            output_dir=Path(args.output).expanduser() if args.output else None,
+        )
+        if args.json:
+            print(json.dumps(out, indent=2, default=str))
+        else:
+            print("z0int backends bench")
+            print(f"  contract={args.contract}")
+            print(f"  output={out.get('output_dir')}")
+            print(f"  raw={out.get('raw_jsonl')}")
+            print(f"  summary={out.get('summary_json')}")
+            print(f"  pareto={out.get('pareto_md')}")
         return 0
 
     print(f"unknown backends command: {cmd}", file=sys.stderr)

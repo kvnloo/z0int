@@ -69,3 +69,18 @@ z0int backends eval --backend nanojev --input tests/fixtures/nanojev_request.jso
 - **loaded** — weights resident in process
 
 Ordinary `z0int doctor` never loads NanoJev weights.
+
+
+## Pareto benchmark
+
+Compare roster candidates on one contract (no OMP authority, no Kerdoios routing):
+
+```bash
+z0int backends bench --contract decision-capability-v1
+z0int backends bench --backend nanojev_06b --capability rlm.worker_needed --json
+```
+
+Artifacts land under `results/decision-backends/<timestamp>/`:
+`raw.jsonl`, `summary.json`, `pareto.md`.
+
+Unavailable backends report `status=unavailable` with a concrete reason — never silently skipped.
