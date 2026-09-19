@@ -1,8 +1,10 @@
-"""Pareto dominance analysis per capability stratum."""
+"""Pareto dominance analysis per capability stratum (eligible candidates only)."""
 
 from __future__ import annotations
 
 from typing import Any
+
+from .eligibility import capability_baselines
 
 
 def _point(row: dict[str, Any], cap: str) -> dict[str, float | bool | None]:
@@ -24,9 +26,12 @@ def _better(a: float | None, b: float | None, *, higher_is_better: bool) -> bool
 
 
 def _pareto_eligible(stats: dict[str, Any] | None) -> bool:
-    """Hard constraint: any dangerous false prediction excludes a backend from the frontier."""
+    """Eligible only after pre-Pareto gates (unsafe, competence, evidence strength)."""
     if not stats:
         return False
+    if stats.get("pareto_eligible") is not None:
+        return bool(stats.get("pareto_eligible"))
+    # Legacy summaries without enrichment: unsafe-only fallback.
     dang = stats.get("dangerous_false_rate")
     if dang is not None and float(dang) > 0:
         return False
@@ -66,7 +71,7 @@ def pareto_frontier(backends: list[dict[str, Any]], cap: str) -> list[str]:
     frontier: list[str] = []
     for i, bid in enumerate(ids):
         dominated = False
-        for j, other in enumerate(ids):
+        for j, _other in enumerate(ids):
             if i == j:
                 continue
             if dominates(eligible[j], eligible[i], cap):
@@ -86,11 +91,11 @@ def dominated_by(backends: list[dict[str, Any]], cap: str) -> dict[str, list[str
     ids = [str(b["candidate_id"]) for b in eligible]
     out: dict[str, list[str]] = {i: [] for i in ids}
     for i, a_id in enumerate(ids):
-        for j, b_id in enumerate(ids):
+        for j, _b_id in enumerate(ids):
             if i == j:
                 continue
             if dominates(eligible[j], eligible[i], cap):
-                out[a_id].append(b_id)
+                out[a_id].append(ids[j])
     return {k: v for k, v in out.items() if v}
 
 
@@ -99,28 +104,53 @@ def build_pareto_report(
     contract: str,
     capabilities: list[str],
     backend_summaries: list[dict[str, Any]],
+    examples: list | None = None,
 ) -> dict[str, Any]:
     per_cap: dict[str, Any] = {}
+    cap_baselines = capability_baselines(examples or [], capabilities) if examples else {}
+
     for cap in capabilities:
         strata = {
             b["candidate_id"]: (b.get("by_capability") or {}).get(cap)
             for b in backend_summaries
             if (b.get("by_capability") or {}).get(cap)
         }
+        eligibility_rows = {
+            bid: (b.get("eligibility_by_capability") or {}).get(cap)
+            for b in backend_summaries
+            for bid in [b["candidate_id"]]
+            if (b.get("eligibility_by_capability") or {}).get(cap)
+        }
+        excluded_unsafe = [
+            bid
+            for bid, stats in strata.items()
+            if stats and (stats.get("eligibility_status") == "excluded_unsafe" or (
+                stats.get("dangerous_false_rate") is not None and float(stats["dangerous_false_rate"]) > 0
+            ))
+        ]
+        ineligible = [
+            bid
+            for bid, stats in strata.items()
+            if stats
+            and stats.get("eligibility_status") == "measured_but_ineligible"
+            and bid not in excluded_unsafe
+        ]
         per_cap[cap] = {
             "pareto_optimal": pareto_frontier(backend_summaries, cap),
             "dominated_by": dominated_by(backend_summaries, cap),
-            "excluded_unsafe": [
-                bid
-                for bid, stats in strata.items()
-                if stats and not _pareto_eligible(stats)
-            ],
+            "excluded_unsafe": excluded_unsafe,
+            "measured_but_ineligible": ineligible,
+            "capability_baselines": cap_baselines.get(cap),
             "strata": strata,
+            "eligibility": eligibility_rows,
         }
     return {
-        "schema": "z0int.backends_bench.pareto.v1",
+        "schema": "z0int.backends_bench.pareto.v2",
         "contract": contract,
-        "note": "No universal winner declared. Dominance is per-capability only.",
+        "note": (
+            "No universal winner declared. Dominance is per-capability only. "
+            "Pareto runs over pareto_eligible candidates (safe + competent + VALIDATED evidence)."
+        ),
         "by_capability": per_cap,
     }
 
@@ -137,31 +167,73 @@ def render_pareto_md(report: dict[str, Any]) -> str:
     for cap, block in (report.get("by_capability") or {}).items():
         lines.append(f"## {cap}")
         lines.append("")
+        base = block.get("capability_baselines") or {}
+        if base.get("trivial_baseline") is not None:
+            lines.append(
+                f"**Capability baselines:** trivial={base['trivial_baseline']:.3f}, "
+                f"competence threshold={base.get('competence_threshold'):.3f} "
+                f"(margin={base.get('competence_margin')}, n_fixtures={base.get('fixture_count')}, "
+                f"validated_min={base.get('validated_min_examples')})"
+            )
+            lines.append("")
         optimal = block.get("pareto_optimal") or []
-        lines.append(f"**Pareto-optimal:** {', '.join(optimal) if optimal else '(none with runnable results)'}")
+        lines.append(
+            f"**Pareto-optimal (eligible only):** {', '.join(optimal) if optimal else '(empty — no eligible candidates)'}"
+        )
         excluded = block.get("excluded_unsafe") or []
         if excluded:
             lines.append(f"**Excluded (dangerous false > 0):** {', '.join(excluded)}")
+        ineligible = block.get("measured_but_ineligible") or []
+        if ineligible:
+            lines.append(f"**Measured but ineligible:** {', '.join(ineligible)}")
         lines.append("")
-        lines.append("| backend | accuracy | p50 ms | mean Brier | dangerous | denom |")
-        lines.append("|---------|----------|--------|------------|-----------|-------|")
+        lines.append(
+            "| backend | n | acc | baseline | threshold | dang | evidence | eligibility | p50 ms | Brier | Pareto |"
+        )
+        lines.append(
+            "|---------|---|-----|----------|-----------|------|----------|-------------|--------|-------|--------|"
+        )
         for bid, stats in sorted((block.get("strata") or {}).items()):
             if not stats:
                 continue
+            elig = stats.get("eligibility_status") or "-"
+            reason = stats.get("ineligibility_reason")
+            if reason and elig != "pareto_eligible":
+                elig = f"{elig} ({reason})"
+            pareto_status = stats.get("pareto_status") or "-"
+            if bid in optimal:
+                pareto_status = "optimal"
             lines.append(
-                "| {bid} | {acc:.3f} | {p50} | {brier} | {dang} | {n} |".format(
+                "| {bid} | {n} | {acc:.3f} | {base:.3f} | {thr} | {dang} | {ev} | {elig} | {p50} | {brier} | {pareto} |".format(
                     bid=bid,
+                    n=stats.get("n") or stats.get("denominator"),
                     acc=float(stats.get("verified_accuracy") or 0),
+                    base=float(stats.get("trivial_baseline") or 0),
+                    thr=(
+                        f"{stats['competence_threshold']:.3f}"
+                        if stats.get("competence_threshold") is not None
+                        else "-"
+                    ),
+                    dang=(
+                        f"{stats['dangerous_false_rate']:.3f}"
+                        if stats.get("dangerous_false_rate") is not None
+                        else "-"
+                    ),
+                    ev=stats.get("evidence_state") or "-",
+                    elig=elig,
                     p50=stats.get("latency_ms_p50"),
-                    brier=("{:.4f}".format(stats["mean_brier"]) if stats.get("mean_brier") is not None else "-"),
-                    dang=("{:.3f}".format(stats["dangerous_false_rate"]) if stats.get("dangerous_false_rate") is not None else "-"),
-                    n=stats.get("denominator"),
+                    brier=(
+                        f"{stats['mean_brier']:.4f}"
+                        if stats.get("mean_brier") is not None
+                        else "-"
+                    ),
+                    pareto=pareto_status,
                 )
             )
         dom = block.get("dominated_by") or {}
         if dom:
             lines.append("")
-            lines.append("**Dominated by:**")
+            lines.append("**Dominated by (among eligible):**")
             for bid, by in sorted(dom.items()):
                 lines.append(f"- `{bid}` ← {', '.join(f'`{x}`' for x in by)}")
         lines.append("")

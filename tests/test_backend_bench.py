@@ -17,6 +17,7 @@ from z0int.backends.base import (
     DecisionOption,
 )
 from z0int.backends.bench.contract import BENCH_CONTRACT, CAPABILITIES
+from z0int.backends.bench.eligibility import enrich_backend_summary
 from z0int.backends.bench.fixtures import BenchExample, load_fixtures
 from z0int.backends.bench.metrics import score_example
 from z0int.backends.bench.pareto import build_pareto_report, dominates, pareto_frontier
@@ -168,72 +169,96 @@ class BenchHarnessTests(unittest.TestCase):
             self.assertEqual(summary["contract"], BENCH_CONTRACT)
             self.assertTrue(Path(out["pareto_md"]).is_file())
 
-    def test_pareto_dominance(self):
-        a = {
-            "candidate_id": "fast",
-            "commercial_use": True,
-            "vram_mb_peak": 1000,
-            "by_capability": {
-                "rlm.worker_needed": {
-                    "verified_accuracy": 0.9,
-                    "latency_ms_p50": 10,
-                    "mean_brier": 0.1,
-                    "denominator": 3,
-                }
+    def test_pareto_dominance_requires_eligibility(self):
+        examples = load_fixtures()
+        a = enrich_backend_summary(
+            {
+                "candidate_id": "fast",
+                "commercial_use": True,
+                "vram_mb_peak": 1000,
+                "by_capability": {
+                    "rlm.worker_needed": {
+                        "verified_accuracy": 0.9,
+                        "latency_ms_p50": 10,
+                        "mean_brier": 0.1,
+                        "dangerous_false_rate": 0.0,
+                        "denominator": 50,
+                    }
+                },
             },
-        }
-        b = {
-            "candidate_id": "slow",
-            "commercial_use": True,
-            "vram_mb_peak": 8000,
-            "by_capability": {
-                "rlm.worker_needed": {
-                    "verified_accuracy": 0.85,
-                    "latency_ms_p50": 100,
-                    "mean_brier": 0.12,
-                    "denominator": 3,
-                }
+            examples=examples,
+            capabilities=["rlm.worker_needed"],
+            validated_min=50,
+        )
+        b = enrich_backend_summary(
+            {
+                "candidate_id": "slow",
+                "commercial_use": True,
+                "vram_mb_peak": 8000,
+                "by_capability": {
+                    "rlm.worker_needed": {
+                        "verified_accuracy": 0.85,
+                        "latency_ms_p50": 100,
+                        "mean_brier": 0.12,
+                        "dangerous_false_rate": 0.0,
+                        "denominator": 50,
+                    }
+                },
             },
-        }
+            examples=examples,
+            capabilities=["rlm.worker_needed"],
+            validated_min=50,
+        )
+        self.assertTrue(a["by_capability"]["rlm.worker_needed"]["pareto_eligible"])
         self.assertTrue(dominates(a, b, "rlm.worker_needed"))
         frontier = pareto_frontier([a, b], "rlm.worker_needed")
         self.assertIn("fast", frontier)
 
     def test_unsafe_backend_excluded_from_pareto(self):
-        safe = {
-            "candidate_id": "safe",
-            "commercial_use": True,
-            "vram_mb_peak": 3000,
-            "by_capability": {
-                "retry_or_escalate": {
-                    "verified_accuracy": 0.5,
-                    "latency_ms_p50": 50,
-                    "mean_brier": 0.2,
-                    "dangerous_false_rate": 0.0,
-                    "denominator": 2,
-                }
+        examples = load_fixtures()
+        safe = enrich_backend_summary(
+            {
+                "candidate_id": "safe",
+                "commercial_use": True,
+                "vram_mb_peak": 3000,
+                "by_capability": {
+                    "retry_or_escalate": {
+                        "verified_accuracy": 0.5,
+                        "latency_ms_p50": 50,
+                        "mean_brier": 0.2,
+                        "dangerous_false_rate": 0.0,
+                        "denominator": 2,
+                    }
+                },
             },
-        }
-        unsafe = {
-            "candidate_id": "unsafe",
-            "commercial_use": True,
-            "vram_mb_peak": 100,
-            "by_capability": {
-                "retry_or_escalate": {
-                    "verified_accuracy": 1.0,
-                    "latency_ms_p50": 8,
-                    "mean_brier": 0.05,
-                    "dangerous_false_rate": 0.5,
-                    "denominator": 2,
-                }
+            examples=examples,
+            capabilities=["retry_or_escalate"],
+        )
+        unsafe = enrich_backend_summary(
+            {
+                "candidate_id": "unsafe",
+                "commercial_use": True,
+                "vram_mb_peak": 100,
+                "by_capability": {
+                    "retry_or_escalate": {
+                        "verified_accuracy": 1.0,
+                        "latency_ms_p50": 8,
+                        "mean_brier": 0.05,
+                        "dangerous_false_rate": 0.5,
+                        "denominator": 2,
+                    }
+                },
             },
-        }
+            examples=examples,
+            capabilities=["retry_or_escalate"],
+        )
         frontier = pareto_frontier([safe, unsafe], "retry_or_escalate")
-        self.assertEqual(frontier, ["safe"])
+        self.assertEqual(frontier, [])
         report = build_pareto_report(
             contract=BENCH_CONTRACT,
             capabilities=["retry_or_escalate"],
             backend_summaries=[safe, unsafe],
+            examples=examples,
         )
         block = report["by_capability"]["retry_or_escalate"]
         self.assertIn("unsafe", block["excluded_unsafe"])

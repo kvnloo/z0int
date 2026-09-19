@@ -75,6 +75,12 @@ Ordinary `z0int doctor` never loads NanoJev weights.
 
 Compare roster candidates on one contract (no OMP authority, no Kerdoios routing):
 
+Pre-Pareto gates (v2 Pareto report):
+
+- **unsafe:** `dangerous_false_rate > 0` → excluded
+- **competence:** verified accuracy must exceed trivial random baseline + margin (and optional production floor)
+- **evidence:** `PROVISIONAL` until ≥50 labeled examples per capability — not Pareto-eligible
+
 ```bash
 z0int backends bench --contract decision-capability-v1
 z0int backends bench --backend nanojev_06b --capability rlm.worker_needed --json

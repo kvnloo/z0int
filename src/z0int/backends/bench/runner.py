@@ -16,6 +16,7 @@ from z0int.tokenomics_emit import emit_provider_usage
 from ..base import DecisionBackend, result_to_dict
 from .contract import BENCH_CONTRACT, BENCH_SCHEMA, CAPABILITIES, ROSTER_CANDIDATES
 from .fixtures import BenchExample, default_fixtures_path, load_fixtures
+from .eligibility import ELIGIBILITY_SCHEMA, enrich_backend_summaries
 from .metrics import aggregate_rows, score_example
 from .pareto import build_pareto_report, render_pareto_md
 from .roster import create_backend_for_candidate, probe_candidate, roster_adapter_table
@@ -270,10 +271,17 @@ def run_bench(
         for row in all_rows:
             fh.write(json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n")
 
+    cap_list = [c for c in CAPABILITIES if not capability_filter or c == capability_filter]
+    enriched_summaries = enrich_backend_summaries(
+        backend_summaries,
+        examples,
+        cap_list,
+    )
     pareto = build_pareto_report(
         contract=contract,
-        capabilities=[c for c in CAPABILITIES if not capability_filter or c == capability_filter],
-        backend_summaries=backend_summaries,
+        capabilities=cap_list,
+        backend_summaries=enriched_summaries,
+        examples=examples,
     )
     summary = {
         "schema": BENCH_SCHEMA,
@@ -283,7 +291,12 @@ def run_bench(
         "capabilities": list(CAPABILITIES),
         "candidates": candidates,
         "adapter_table": roster_adapter_table(),
-        "backends": backend_summaries,
+        "eligibility": {
+            "schema": ELIGIBILITY_SCHEMA,
+            "competence_margin": 0.05,
+            "validated_min_examples": 50,
+        },
+        "backends": enriched_summaries,
         "pareto": pareto,
         "aggregate": aggregate_rows(all_rows),
     }
