@@ -103,3 +103,23 @@ Architecture (from upstream `laya` runtime + HF bundle):
 Z0INT_LAYA_DEVICE=cpu z0int backends bench --backend laya_421m --contract decision-capability-v1
 ```
 
+## Decider adapter (`decider_2b`)
+
+Pinned checkpoint: `Mapika/decider-2b@1d96be0093133e194fe18105a521b3e69be931d2`.
+
+Architecture (from upstream bundled `decider/` runtime + HF bundle):
+
+- Base: `Qwen/Qwen3.5-2B-Base` (~1.9B), fully fine-tuned for typed decisions (v8)
+- Single-pass: one forward pass reads option-letter logits at `Answer k: (` slots
+- Jev-shaped API: `system_one(state, questions)` with choice/score/noul types
+- Emits calibrated probabilities + confidence/certainty; no text generation
+- CUDA/MPS preferred; default bench device CUDA via `Z0INT_DECIDER_DEVICE=cuda`
+- Optional CUDA graphs via `Z0INT_DECIDER_USE_GRAPHS=1` (default on CUDA)
+- License: Apache-2.0 (commercial use OK)
+- Requires `flash-linear-attention` for Qwen3.5 linear-attention layers on GPU
+
+```bash
+Z0INT_DECIDER_DEVICE=cuda z0int backends bench --backend decider_2b --contract decision-capability-v1
+Z0INT_LAYA_DEVICE=cpu z0int backends bench --backend decider_2b,nanojev_06b,laya_421m --contract decision-capability-v1
+```
+

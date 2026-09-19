@@ -9,3 +9,4 @@ sentencepiece==0.2.1
 protobuf==7.36.1
 pytest==8.4.2
 laya==0.1.6
+flash-linear-attention==0.5.2

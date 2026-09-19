@@ -25,6 +25,21 @@ def _repo_root() -> Path:
     return Path(__file__).resolve().parents[4]
 
 
+
+
+def _release_gpu_between_candidates() -> None:
+    """Best-effort VRAM cleanup between roster candidates in one bench process."""
+    try:
+        import gc
+
+        gc.collect()
+        import torch
+
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+    except Exception:
+        pass
+
 def _results_root() -> Path:
     return _repo_root() / "results" / "decision-backends"
 
@@ -227,6 +242,7 @@ def run_bench(
             "openjev_06b": "openjev_06b",
             "openjev_4b": "openjev_4b",
             "laya": "laya_421m",
+            "decider": "decider_2b",
         }
         requested = [x.strip() for x in str(backend_filter).split(",") if x.strip()]
         candidates = []
@@ -247,6 +263,7 @@ def run_bench(
         rows, summary = run_candidate(cid, examples, backend_factory=backend_factory)
         all_rows.extend(rows)
         backend_summaries.append(summary)
+        _release_gpu_between_candidates()
 
     raw_path = out_dir / "raw.jsonl"
     with raw_path.open("w", encoding="utf-8") as fh:

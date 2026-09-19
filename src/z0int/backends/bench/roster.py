@@ -141,10 +141,50 @@ def probe_candidate(candidate_id: str) -> CandidateStatus:
                 family=family,
             )
 
-    if candidate_id in ("decider_2b", "system_one_4b"):
-        note = "manifest pin only; DecisionBackend adapter not implemented"
-        if candidate_id == "system_one_4b":
-            note += " (CC-BY-NC-4.0 — non-commercial)"
+    if candidate_id == "decider_2b":
+        from ..decider import DeciderBackend
+
+        try:
+            backend = DeciderBackend.for_manifest_id(candidate_id)
+            health = backend.health(load=False)
+            if health.ready:
+                return CandidateStatus(
+                    candidate_id=candidate_id,
+                    status="available",
+                    reason=None,
+                    backend_impl="decider",
+                    commercial_use=True,
+                    platforms=platforms or ("cuda", "mps"),
+                    license=meta.get("license") or "apache-2.0",
+                    optional=optional,
+                    family=family,
+                )
+            return CandidateStatus(
+                candidate_id=candidate_id,
+                status="unavailable",
+                reason=health.detail or "checkpoint not ready",
+                backend_impl="decider",
+                commercial_use=True,
+                platforms=platforms or ("cuda", "mps"),
+                license=meta.get("license") or "apache-2.0",
+                optional=optional,
+                family=family,
+            )
+        except Exception as exc:  # noqa: BLE001
+            return CandidateStatus(
+                candidate_id=candidate_id,
+                status="unavailable",
+                reason=f"{type(exc).__name__}: {exc}",
+                backend_impl="decider",
+                commercial_use=True,
+                platforms=platforms or ("cuda", "mps"),
+                license=meta.get("license") or "apache-2.0",
+                optional=optional,
+                family=family,
+            )
+
+    if candidate_id == "system_one_4b":
+        note = "manifest pin only; DecisionBackend adapter not implemented (CC-BY-NC-4.0 — non-commercial)"
         return CandidateStatus(
             candidate_id=candidate_id,
             status="unavailable",
@@ -269,6 +309,10 @@ def create_backend_for_candidate(candidate_id: str) -> DecisionBackend:
         from ..laya import LayaBackend
 
         return LayaBackend.for_manifest_id(candidate_id)
+    if candidate_id == "decider_2b":
+        from ..decider import DeciderBackend
+
+        return DeciderBackend.for_manifest_id(candidate_id)
     if candidate_id in ("openjev_06b", "openjev_4b"):
         from ..openjev_direct import OpenJevDirectBackend
 
