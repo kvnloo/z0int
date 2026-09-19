@@ -146,8 +146,11 @@ class BenchHarnessTests(unittest.TestCase):
 
         with tempfile.TemporaryDirectory() as tmp:
             import z0int.backends.bench.roster as roster_mod
+            import z0int.backends.bench.runner as runner_mod
 
-            old_probe = roster_mod.probe_candidate
+            old_probe_r = runner_mod.probe_candidate
+            old_probe_s = roster_mod.probe_candidate
+            runner_mod.probe_candidate = always_available
             roster_mod.probe_candidate = always_available
             try:
                 out = run_bench(
@@ -157,11 +160,13 @@ class BenchHarnessTests(unittest.TestCase):
                     backend_factory=factory,
                 )
             finally:
-                roster_mod.probe_candidate = old_probe
+                runner_mod.probe_candidate = old_probe_r
+                roster_mod.probe_candidate = old_probe_s
 
             self.assertTrue(out["ok"])
-            self.assertTrue(out["parity_ok"], msg=out.get("parity_errors"))
+            self.assertTrue(out["event_sourced"])
             self.assertTrue(Path(out["tokenomics_events"]).is_file())
+            self.assertFalse(out["summary"]["measurement"]["dual_write"])
             raw = Path(out["raw_jsonl"]).read_text(encoding="utf-8").strip().splitlines()
             self.assertEqual(len(raw), len(examples))
             row = json.loads(raw[0])

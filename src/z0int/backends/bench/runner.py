@@ -1,4 +1,16 @@
-"""Run decision-capability-v1 benchmark across roster candidates."""
+"""Run decision-capability-v1 benchmark across roster candidates.
+
+Architecture invariant
+----------------------
+Benchmark persistence is **event-sourced**:
+
+1. ``run_candidate`` executes the backend and emits Tokenomics events.
+2. Compatibility rows are produced ONLY via ``materialize_trace`` /
+   ``materialize_rows`` from those events.
+3. ``raw.jsonl`` is a derived view; ``tokenomics-events.jsonl`` is canonical.
+
+Do not construct ``z0int.backends_bench.row.v1`` dicts by hand in this module.
+"""
 
 from __future__ import annotations
 
@@ -11,6 +23,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
 
+from tokenomics.coverage import format_coverage_text
+
 from ..base import DecisionBackend, result_to_dict
 from .analytics import (
     build_coverage_section,
@@ -18,12 +32,10 @@ from .analytics import (
     build_paired_comparisons,
     render_analytics_md,
 )
-from tokenomics.coverage import format_coverage_text
-
 from .contract import BENCH_CONTRACT, BENCH_SCHEMA, CAPABILITIES, ROSTER_CANDIDATES
-from .fixtures import BenchExample, default_fixtures_path, load_fixtures
 from .eligibility import ELIGIBILITY_SCHEMA, enrich_backend_summaries
-from .materialize import compare_rows, materialize_rows
+from .fixtures import BenchExample, default_fixtures_path, load_fixtures
+from .materialize import materialize_rows, materialize_trace
 from .metrics import aggregate_rows, score_example
 from .pareto import build_pareto_report, render_pareto_md
 from .roster import create_backend_for_candidate, probe_candidate, roster_adapter_table
@@ -33,8 +45,6 @@ from .tokenomics_bridge import BenchTokenomicsSession
 
 def _repo_root() -> Path:
     return Path(__file__).resolve().parents[4]
-
-
 
 
 def _release_gpu_between_candidates() -> None:
@@ -49,6 +59,7 @@ def _release_gpu_between_candidates() -> None:
             torch.cuda.empty_cache()
     except Exception:
         pass
+
 
 def _results_root() -> Path:
     return _repo_root() / "results" / "decision-backends"
@@ -99,6 +110,11 @@ def _answer_dict(result, qid: str) -> dict[str, Any]:
     return {}
 
 
+def _materialize_emitted(tm_session: BenchTokenomicsSession, trace_id: str) -> dict[str, Any]:
+    """Single persistence path: Tokenomics events → compatibility row."""
+    return materialize_trace(tm_session.memory.events, trace_id)
+
+
 def run_candidate(
     candidate_id: str,
     examples: list[BenchExample],
@@ -106,6 +122,7 @@ def run_candidate(
     tm_session: BenchTokenomicsSession,
     backend_factory: Callable[[str], DecisionBackend] | None = None,
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Execute one backend; persist ONLY via Tokenomics → materialize."""
     status = probe_candidate(candidate_id)
     rows: list[dict[str, Any]] = []
     if status.status != "available":
@@ -130,21 +147,7 @@ def run_candidate(
                 platforms=status.platforms,
                 backend_impl=status.backend_impl,
             )
-            rows.append(
-                {
-                    "schema": "z0int.backends_bench.row.v1",
-                    "contract": BENCH_CONTRACT,
-                    "candidate_id": candidate_id,
-                    "capability": ex.capability,
-                    "fixture_id": ex.id,
-                    "provenance": ex.provenance,
-                    "status": "unavailable",
-                    "reason": status.reason,
-                    "commercial_use": status.commercial_use,
-                    "platforms": list(status.platforms),
-                    "backend_impl": status.backend_impl,
-                }
-            )
+            rows.append(_materialize_emitted(tm_session, trace_id))
         summary = {
             "candidate_id": candidate_id,
             "status": status.status,
@@ -179,19 +182,6 @@ def run_candidate(
             model_revision=str(model_revision) if model_revision else None,
             input_bytes=input_bytes,
         )
-        base = {
-            "schema": "z0int.backends_bench.row.v1",
-            "contract": BENCH_CONTRACT,
-            "candidate_id": candidate_id,
-            "capability": ex.capability,
-            "fixture_id": ex.id,
-            "provenance": ex.provenance,
-            "commercial_use": status.commercial_use,
-            "platforms": list(status.platforms),
-            "backend_impl": status.backend_impl,
-            "device": device,
-            "input_bytes": input_bytes,
-        }
         try:
             t0 = time.perf_counter()
             result = backend.evaluate(ex.to_request())
@@ -228,22 +218,8 @@ def run_candidate(
                 result_dict=result_dict,
                 input_tokens=(result.diagnostics or {}).get("input_tokens"),
             )
-            row = {
-                **base,
-                "status": "ok",
-                "prediction": pred,
-                "gold": ex.gold,
-                "latency_ms": latency_ms,
-                "startup_ms": startup_ms if first else None,
-                "ram_mb": ram_mb,
-                "vram_mb": vram_mb,
-                "energy": "unavailable",
-                "energy_reason": "no platform energy counter wired",
-                **scored,
-                "result": result_dict,
-            }
             first = False
-            rows.append(row)
+            rows.append(_materialize_emitted(tm_session, trace_id))
         except Exception as exc:  # noqa: BLE001
             tm_session.emit_error(
                 trace_id=trace_id,
@@ -257,14 +233,7 @@ def run_candidate(
                 backend_impl=status.backend_impl,
                 device=str(device) if device is not None else None,
             )
-            rows.append(
-                {
-                    **base,
-                    "status": "error",
-                    "reason": f"{type(exc).__name__}: {exc}",
-                    "latency_ms": None,
-                }
-            )
+            rows.append(_materialize_emitted(tm_session, trace_id))
     summary = {
         "candidate_id": candidate_id,
         "status": "available",
@@ -335,7 +304,7 @@ def run_bench(
         if k.startswith("Z0INT_") and k.endswith(("_DEVICE", "_USE_GRAPHS"))
     }
 
-    inline_rows: list[dict[str, Any]] = []
+    candidate_rows: list[dict[str, Any]] = []
     backend_summaries: list[dict[str, Any]] = []
     for cid in candidates:
         rows, summary = run_candidate(
@@ -344,14 +313,18 @@ def run_bench(
             tm_session=tm_session,
             backend_factory=backend_factory,
         )
-        inline_rows.extend(rows)
+        candidate_rows.extend(rows)
         backend_summaries.append(summary)
         _release_gpu_between_candidates()
 
     finished_at = datetime.now(timezone.utc)
-    materialized_rows = materialize_rows(tm_session.memory.events)
-    parity_errors = compare_rows(inline_rows, materialized_rows)
-    all_rows = materialized_rows
+    # Re-materialize from the full in-memory event stream (deterministic; single source).
+    all_rows = materialize_rows(tm_session.memory.events)
+    # candidate_rows were also materialized per-trace; they must match the batch view.
+    if len(candidate_rows) != len(all_rows):
+        raise RuntimeError(
+            f"event-sourced row count mismatch: per-trace={len(candidate_rows)} batch={len(all_rows)}"
+        )
 
     raw_path = out_dir / "raw.jsonl"
     with raw_path.open("w", encoding="utf-8") as fh:
@@ -400,8 +373,8 @@ def run_bench(
         "measurement": {
             "canonical": "tokenomics-events.jsonl",
             "materialized": "raw.jsonl",
-            "parity_ok": not parity_errors,
-            "parity_errors": parity_errors[:20],
+            "event_sourced": True,
+            "dual_write": False,
         },
         "eligibility": {
             "schema": ELIGIBILITY_SCHEMA,
@@ -437,7 +410,6 @@ def run_bench(
         "summary_json": str(summary_path),
         "pareto_md": str(pareto_path),
         "analytics_json": str(analytics_path),
-        "parity_ok": not parity_errors,
-        "parity_errors": parity_errors,
+        "event_sourced": True,
         "summary": summary,
     }

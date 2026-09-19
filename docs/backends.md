@@ -93,6 +93,10 @@ Artifacts land under `results/decision-backends/<timestamp>/`:
 | `tokenomics-events.jsonl` | **Canonical raw measurement** (Tokenomics traces) |
 | `run-manifest.json` | Run identity: git SHAs, dataset hash, device env |
 | `raw.jsonl` | Materialized compatibility view (derived from Tokenomics) |
+
+Benchmark persistence is **event-sourced**: Tokenomics events are canonical;
+`raw.jsonl` is the only compatibility projection. There is no parallel inline
+row builder.
 | `summary.json` | Aggregate metrics + eligibility + Pareto |
 | `analytics.json` / `analytics.md` | Quality, safety, latency, paired comparisons |
 | `coverage.json` / `coverage.md` | Measurement coverage gaps (Tokenomics) |

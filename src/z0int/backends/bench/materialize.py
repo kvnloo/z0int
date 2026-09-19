@@ -1,8 +1,20 @@
-"""Materialize z0int.backends_bench.row.v1 rows from Tokenomics events."""
+"""Materialize z0int.backends_bench.row.v1 rows from Tokenomics events.
+
+Architecture invariant
+----------------------
+Benchmark persistence is **event-sourced**:
+
+- ``tokenomics-events.jsonl`` is the ONLY canonical raw measurement source.
+- ``raw.jsonl`` is a materialized compatibility view derived from those events.
+- Do not construct analytics rows in parallel with event emission.
+
+A future contributor should have difficulty accidentally reintroducing a
+parallel analytics path — all persisted row fields must flow through
+``materialize_row`` / ``materialize_trace``.
+"""
 
 from __future__ import annotations
 
-import json
 import math
 from pathlib import Path
 from typing import Any, Iterable
@@ -33,6 +45,10 @@ def _find(events: list[TokenomicsEvent], kind: str) -> TokenomicsEvent | None:
         if ev.kind == kind:
             return ev
     return None
+
+
+def events_for_trace(events: Iterable[TokenomicsEvent], trace_id: str) -> list[TokenomicsEvent]:
+    return [ev for ev in events if ev.trace_id == trace_id]
 
 
 def materialize_row(events: list[TokenomicsEvent]) -> dict[str, Any]:
@@ -90,7 +106,7 @@ def materialize_row(events: list[TokenomicsEvent]) -> dict[str, Any]:
     abstention_correct = _extra(verification, "decision.abstention_correct") if verification else None
     latency_ms = decision.latency.duration_ms if decision.latency else None
     startup_ms = _attr(decision, "resource.startup_ms")
-    startup_ms = float(startup_ms) if startup_ms else None
+    startup_ms = float(startup_ms) if startup_ms is not None else None
     ram_mb = _attr(decision, "resource.rss_peak_mb")
     vram_mb = _attr(decision, "resource.vram_peak_mb")
 
@@ -101,8 +117,8 @@ def materialize_row(events: list[TokenomicsEvent]) -> dict[str, Any]:
         "gold": gold,
         "latency_ms": latency_ms,
         "startup_ms": startup_ms,
-        "ram_mb": float(ram_mb) if ram_mb else None,
-        "vram_mb": float(vram_mb) if vram_mb else None,
+        "ram_mb": float(ram_mb) if ram_mb is not None else None,
+        "vram_mb": float(vram_mb) if vram_mb is not None else None,
         "energy": "unavailable",
         "energy_reason": "no platform energy counter wired",
         "verified_correct": bool(_attr(verification, "decision.correct")) if verification else None,
@@ -114,9 +130,14 @@ def materialize_row(events: list[TokenomicsEvent]) -> dict[str, Any]:
     return row
 
 
+def materialize_trace(events: Iterable[TokenomicsEvent], trace_id: str) -> dict[str, Any]:
+    """Materialize one compatibility row from an in-memory (or loaded) event stream."""
+    return materialize_row(events_for_trace(events, trace_id))
+
+
 def materialize_rows(events: Iterable[TokenomicsEvent]) -> list[dict[str, Any]]:
     rows = []
-    for trace_id, trace_events in sorted(_events_by_trace(events).items()):
+    for _trace_id, trace_events in sorted(_events_by_trace(events).items()):
         try:
             rows.append(materialize_row(trace_events))
         except ValueError:
@@ -142,12 +163,33 @@ def _normalize_row(row: dict[str, Any]) -> dict[str, Any]:
     return out
 
 
+SEMANTIC_FIELDS = (
+    "candidate_id",
+    "fixture_id",
+    "capability",
+    "status",
+    "prediction",
+    "gold",
+    "verified_correct",
+    "dangerous_false",
+    "brier",
+    "abstention_correct",
+    "reason",
+)
+
+
 def compare_rows(
     old_rows: list[dict[str, Any]],
     new_rows: list[dict[str, Any]],
     *,
     float_tol: float = 1e-2,
+    fields: tuple[str, ...] | None = None,
 ) -> list[str]:
+    """Compare materialized compatibility rows.
+
+    When ``fields`` is set, only those keys are compared (golden semantic parity).
+    Timestamps / event IDs / trace IDs are never part of row payloads and are ignored.
+    """
     errors: list[str] = []
     old_keyed = {(r["candidate_id"], r["fixture_id"]): r for r in old_rows}
     new_keyed = {(r["candidate_id"], r["fixture_id"]): r for r in new_rows}
@@ -158,7 +200,8 @@ def compare_rows(
     for key in sorted(set(old_keyed) & set(new_keyed)):
         o = _normalize_row(old_keyed[key])
         n = _normalize_row(new_keyed[key])
-        for field in sorted(set(o) | set(n)):
+        check_fields = fields if fields is not None else tuple(sorted(set(o) | set(n)))
+        for field in check_fields:
             ov, nv = o.get(field), n.get(field)
             if ov == nv:
                 continue
