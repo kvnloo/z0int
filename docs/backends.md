@@ -11,11 +11,32 @@ Backends implement local (or remote) judgment engines behind one contract.
 
 Importing `z0int.backends.base` is stdlib-only (no torch).
 
+## Decision roster (canonical)
+
+`manifests/models.yaml` → `decision_roster.candidates` lists **Jev/System-One-style
+decision backends** — not general LLM roster entries (Kimi/Qwen/GLM belong elsewhere).
+Kerdoios sees installed weights as secondary `ResourceOffer`s; z0int remains source of truth.
+
+| ID | HF / source | Status | Notes |
+|----|-------------|--------|-------|
+| `laya_421m` | `convaiinnovations/laya` | pinned | ~421M calibrated; CPU/MPS-friendly |
+| `decider_2b` | `Mapika/decider-2b` | pinned | Qwen3.5-2B one-pass typed probs |
+| `nanojev_06b` | `C-Tianyu/NanoJev` | pinned + adapter | parallel decision heads |
+| `reflex` | browser / GitHub | optional | WebGPU demo; no HF pin yet |
+| `system_one_4b` | `pngwn/system-one-qwen3.5-4b-scorer` | pinned | **CC-BY-NC-4.0** (non-commercial) |
+| `openjev_06b` / `openjev_4b` | Qwen base + direct logits | pinned | OpenJev substrate |
+
+Next: benchmark all candidates on one capability contract (`rlm.worker_needed`, tool
+select, retry/escalate, intent route, compression gate) and maintain a Pareto table
+(p50, accuracy, calibration, VRAM, platform).
+
 ## Local vs remote
 
 | Backend | Kind | Notes |
 |---------|------|-------|
 | `nanojev` | local semantic model | Pinned HF bundle `nanojev_06b`; CUDA V0 |
+| `laya` / `decider` / `system_one_4b` | manifest candidates | Adapters TBD; weights via `z0int models sync` |
+| `reflex` | browser / WebGPU | optional; no torch load path yet |
 | OpenJev / vLLM / MB / fly | existing lanes | Not rewritten in the first backend PR; thin adapters later |
 
 Probabilities that sum to one are **complete normalized distributions**.
