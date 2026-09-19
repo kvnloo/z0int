@@ -460,7 +460,7 @@ A candidate that is biologically interesting but does not improve the measured f
 
 | Repo | Role |
 | --- | --- |
-| `kvnloo/z0int` | personal decision runtime, scorers, onboarding/training surfaces |
+| `kvnloo/z0intelligence` (package `z0int`) | personal decision runtime, scorers, onboarding/training surfaces |
 | `kvnloo/evolution-lab` | experiment genomes, ABAB, DAgger, search, frozen promotion gates |
 | `kvnloo/frontier-kb` | research memory, evidence, claims, kill criteria |
 | `kvnloo/aodl` | optional typed intent/orchestration IR |

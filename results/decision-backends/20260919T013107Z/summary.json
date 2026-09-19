@@ -1,0 +1,343 @@
+{
+  "schema": "z0int.backends_bench.v1",
+  "contract": "decision-capability-v1",
+  "timestamp": "20260919T013107Z",
+  "fixtures_path": "/home/kvn/tmp/openjev/benchmarks/fixtures/decision-capability-v1/examples.jsonl",
+  "capabilities": [
+    "rlm.worker_needed",
+    "tool_family_select",
+    "retry_or_escalate",
+    "context_compress_needed",
+    "verification_needed"
+  ],
+  "candidates": [
+    "laya_421m",
+    "decider_2b",
+    "nanojev_06b",
+    "reflex",
+    "system_one_4b",
+    "openjev_06b",
+    "openjev_4b",
+    "local_mb"
+  ],
+  "adapter_table": [
+    {
+      "candidate_id": "laya_421m",
+      "status": "unavailable",
+      "reason": "manifest pin only; DecisionBackend adapter not implemented",
+      "backend_impl": null,
+      "commercial_use": true,
+      "platforms": [
+        "cpu",
+        "mps",
+        "cuda"
+      ],
+      "license": "apache-2.0",
+      "optional": true,
+      "family": "decision_backend"
+    },
+    {
+      "candidate_id": "decider_2b",
+      "status": "unavailable",
+      "reason": "manifest pin only; DecisionBackend adapter not implemented",
+      "backend_impl": null,
+      "commercial_use": true,
+      "platforms": [
+        "cuda",
+        "mps"
+      ],
+      "license": "apache-2.0",
+      "optional": true,
+      "family": "decision_backend"
+    },
+    {
+      "candidate_id": "nanojev_06b",
+      "status": "available",
+      "reason": null,
+      "backend_impl": "nanojev",
+      "commercial_use": true,
+      "platforms": [
+        "cuda"
+      ],
+      "license": null,
+      "optional": false,
+      "family": "decision_backend"
+    },
+    {
+      "candidate_id": "reflex",
+      "status": "unavailable",
+      "reason": "browser_app; no headless DecisionBackend adapter for bench",
+      "backend_impl": null,
+      "commercial_use": null,
+      "platforms": [
+        "webgpu",
+        "browser"
+      ],
+      "license": null,
+      "optional": true,
+      "family": "decision_backend"
+    },
+    {
+      "candidate_id": "system_one_4b",
+      "status": "unavailable",
+      "reason": "manifest pin only; DecisionBackend adapter not implemented (CC-BY-NC-4.0 — non-commercial)",
+      "backend_impl": null,
+      "commercial_use": false,
+      "platforms": [
+        "cuda"
+      ],
+      "license": "cc-by-nc-4.0",
+      "optional": true,
+      "family": "decision_backend"
+    },
+    {
+      "candidate_id": "openjev_06b",
+      "status": "unavailable",
+      "reason": "TypeError: BackendHealth.__init__() got an unexpected keyword argument 'revision'",
+      "backend_impl": "openjev_direct",
+      "commercial_use": true,
+      "platforms": [],
+      "license": null,
+      "optional": false,
+      "family": "decision_backend"
+    },
+    {
+      "candidate_id": "openjev_4b",
+      "status": "unavailable",
+      "reason": "TypeError: BackendHealth.__init__() got an unexpected keyword argument 'revision'",
+      "backend_impl": "openjev_direct",
+      "commercial_use": true,
+      "platforms": [],
+      "license": null,
+      "optional": false,
+      "family": "decision_backend"
+    },
+    {
+      "candidate_id": "local_mb",
+      "status": "unavailable",
+      "reason": "generated mushroom_body specialist; no typed DecisionBackend adapter yet",
+      "backend_impl": null,
+      "commercial_use": true,
+      "platforms": [
+        "local"
+      ],
+      "license": null,
+      "optional": false,
+      "family": null
+    }
+  ],
+  "backends": [
+    {
+      "candidate_id": "laya_421m",
+      "status": "unavailable",
+      "reason": "manifest pin only; DecisionBackend adapter not implemented",
+      "commercial_use": true,
+      "platforms": [
+        "cpu",
+        "mps",
+        "cuda"
+      ],
+      "backend_impl": null,
+      "examples_total": 11,
+      "examples_ok": 0,
+      "examples_unavailable": 11,
+      "examples_error": 0,
+      "by_capability": {},
+      "latency_ms_p50": null,
+      "latency_ms_p95": null,
+      "startup_ms_p50": null,
+      "throughput_rps": null,
+      "vram_mb_peak": null,
+      "ram_mb_peak": null
+    },
+    {
+      "candidate_id": "decider_2b",
+      "status": "unavailable",
+      "reason": "manifest pin only; DecisionBackend adapter not implemented",
+      "commercial_use": true,
+      "platforms": [
+        "cuda",
+        "mps"
+      ],
+      "backend_impl": null,
+      "examples_total": 11,
+      "examples_ok": 0,
+      "examples_unavailable": 11,
+      "examples_error": 0,
+      "by_capability": {},
+      "latency_ms_p50": null,
+      "latency_ms_p95": null,
+      "startup_ms_p50": null,
+      "throughput_rps": null,
+      "vram_mb_peak": null,
+      "ram_mb_peak": null
+    },
+    {
+      "candidate_id": "nanojev_06b",
+      "status": "available",
+      "commercial_use": true,
+      "platforms": [
+        "cuda"
+      ],
+      "backend_impl": "nanojev",
+      "examples_total": 11,
+      "examples_ok": 0,
+      "examples_unavailable": 0,
+      "examples_error": 11,
+      "by_capability": {},
+      "latency_ms_p50": null,
+      "latency_ms_p95": null,
+      "startup_ms_p50": null,
+      "throughput_rps": null,
+      "vram_mb_peak": null,
+      "ram_mb_peak": null
+    },
+    {
+      "candidate_id": "reflex",
+      "status": "unavailable",
+      "reason": "browser_app; no headless DecisionBackend adapter for bench",
+      "commercial_use": null,
+      "platforms": [
+        "webgpu",
+        "browser"
+      ],
+      "backend_impl": null,
+      "examples_total": 11,
+      "examples_ok": 0,
+      "examples_unavailable": 11,
+      "examples_error": 0,
+      "by_capability": {},
+      "latency_ms_p50": null,
+      "latency_ms_p95": null,
+      "startup_ms_p50": null,
+      "throughput_rps": null,
+      "vram_mb_peak": null,
+      "ram_mb_peak": null
+    },
+    {
+      "candidate_id": "system_one_4b",
+      "status": "unavailable",
+      "reason": "manifest pin only; DecisionBackend adapter not implemented (CC-BY-NC-4.0 — non-commercial)",
+      "commercial_use": false,
+      "platforms": [
+        "cuda"
+      ],
+      "backend_impl": null,
+      "examples_total": 11,
+      "examples_ok": 0,
+      "examples_unavailable": 11,
+      "examples_error": 0,
+      "by_capability": {},
+      "latency_ms_p50": null,
+      "latency_ms_p95": null,
+      "startup_ms_p50": null,
+      "throughput_rps": null,
+      "vram_mb_peak": null,
+      "ram_mb_peak": null
+    },
+    {
+      "candidate_id": "openjev_06b",
+      "status": "unavailable",
+      "reason": "TypeError: BackendHealth.__init__() got an unexpected keyword argument 'revision'",
+      "commercial_use": true,
+      "platforms": [],
+      "backend_impl": "openjev_direct",
+      "examples_total": 11,
+      "examples_ok": 0,
+      "examples_unavailable": 11,
+      "examples_error": 0,
+      "by_capability": {},
+      "latency_ms_p50": null,
+      "latency_ms_p95": null,
+      "startup_ms_p50": null,
+      "throughput_rps": null,
+      "vram_mb_peak": null,
+      "ram_mb_peak": null
+    },
+    {
+      "candidate_id": "openjev_4b",
+      "status": "unavailable",
+      "reason": "TypeError: BackendHealth.__init__() got an unexpected keyword argument 'revision'",
+      "commercial_use": true,
+      "platforms": [],
+      "backend_impl": "openjev_direct",
+      "examples_total": 11,
+      "examples_ok": 0,
+      "examples_unavailable": 11,
+      "examples_error": 0,
+      "by_capability": {},
+      "latency_ms_p50": null,
+      "latency_ms_p95": null,
+      "startup_ms_p50": null,
+      "throughput_rps": null,
+      "vram_mb_peak": null,
+      "ram_mb_peak": null
+    },
+    {
+      "candidate_id": "local_mb",
+      "status": "unavailable",
+      "reason": "generated mushroom_body specialist; no typed DecisionBackend adapter yet",
+      "commercial_use": true,
+      "platforms": [
+        "local"
+      ],
+      "backend_impl": null,
+      "examples_total": 11,
+      "examples_ok": 0,
+      "examples_unavailable": 11,
+      "examples_error": 0,
+      "by_capability": {},
+      "latency_ms_p50": null,
+      "latency_ms_p95": null,
+      "startup_ms_p50": null,
+      "throughput_rps": null,
+      "vram_mb_peak": null,
+      "ram_mb_peak": null
+    }
+  ],
+  "pareto": {
+    "schema": "z0int.backends_bench.pareto.v1",
+    "contract": "decision-capability-v1",
+    "note": "No universal winner declared. Dominance is per-capability only.",
+    "by_capability": {
+      "rlm.worker_needed": {
+        "pareto_optimal": [],
+        "dominated_by": {},
+        "strata": {}
+      },
+      "tool_family_select": {
+        "pareto_optimal": [],
+        "dominated_by": {},
+        "strata": {}
+      },
+      "retry_or_escalate": {
+        "pareto_optimal": [],
+        "dominated_by": {},
+        "strata": {}
+      },
+      "context_compress_needed": {
+        "pareto_optimal": [],
+        "dominated_by": {},
+        "strata": {}
+      },
+      "verification_needed": {
+        "pareto_optimal": [],
+        "dominated_by": {},
+        "strata": {}
+      }
+    }
+  },
+  "aggregate": {
+    "examples_total": 88,
+    "examples_ok": 0,
+    "examples_unavailable": 77,
+    "examples_error": 11,
+    "by_capability": {},
+    "latency_ms_p50": null,
+    "latency_ms_p95": null,
+    "startup_ms_p50": null,
+    "throughput_rps": null,
+    "vram_mb_peak": null,
+    "ram_mb_peak": null
+  }
+}

@@ -18,6 +18,16 @@ class PathsLayout(unittest.TestCase):
 
 
 class ModelsPlan(unittest.TestCase):
+    def test_decision_roster_five_post_models(self):
+        from z0int.models_mgmt import decision_roster
+
+        roster = decision_roster()
+        for mid in ("laya_421m", "decider_2b", "nanojev_06b", "reflex", "system_one_4b"):
+            self.assertIn(mid, roster["candidates"])
+            self.assertEqual(roster["entries"][mid]["family"], "decision_backend")
+        self.assertFalse(roster["entries"]["system_one_4b"].get("commercial_use", True))
+        self.assertEqual(roster["entries"]["reflex"]["type"], "browser_app")
+
     def test_plan_twelve_gb(self):
         from z0int.models_mgmt import plan_models
 

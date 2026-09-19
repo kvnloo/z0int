@@ -14,6 +14,25 @@ from .queue import record_arm
 from .schema import ReplayResult
 from . import store
 
+def _unwrap_payload(job: dict[str, Any]) -> dict[str, Any]:
+    """Jobs store enqueue body as payload; snapshot/kind may be nested one level."""
+    body = job.get("payload") or {}
+    if not isinstance(body, dict):
+        return {}
+    inner = body.get("payload")
+    if isinstance(inner, dict) and (
+        "snapshot" in inner
+        or "kind" in inner
+        or "family" in inner
+        or "recipe_champion" in inner
+        or "recipe_challenger" in inner
+    ):
+        merged = dict(body)
+        merged.update(inner)
+        return merged
+    return body
+
+
 
 def _simulate_context_cost(policy: dict[str, Any], snapshot: dict[str, Any]) -> dict[str, Any]:
     """Deterministic cost model from policy ops (no network)."""
@@ -54,7 +73,7 @@ def _simulate_context_cost(policy: dict[str, Any], snapshot: dict[str, Any]) -> 
 
 
 def run_abab_job(job: dict[str, Any]) -> dict[str, Any]:
-    payload = job.get("payload") or {}
+    payload = _unwrap_payload(job)
     snapshot = payload.get("snapshot") or {}
     verifier_id = payload.get("verifier_id") or "unknown"
     task_id = snapshot.get("task_snapshot_id") or job.get("trace_id") or "task"
@@ -103,6 +122,7 @@ def run_abab_job(job: dict[str, Any]) -> dict[str, Any]:
         rec = record_arm(job["id"], name, rr.treatment_hash, status="done", result=rr.to_dict())
         row = rr.to_dict()
         row["arm_record"] = rec
+        row["trace_id"] = job.get("trace_id")
         store.append_result(row)
         results.append(row)
         return rr
@@ -142,3 +162,101 @@ def run_abab_job(job: dict[str, Any]) -> dict[str, Any]:
         "arms": results,
         "verifier_id": verifier_id,
     }
+
+
+def run_contrastive_job(job: dict[str, Any]) -> dict[str, Any]:
+    """Contrastive evidence-sufficiency arm (one mutation axis: evidence filter).
+
+    Payload:
+      family: ContrastFamily dict OR omit to use built-in fixture
+      recipe_champion / recipe_challenger: keep/drop evidence recipes
+    Does not claim verified_success for production — records pair_pass only.
+    """
+    import json
+
+    from z0int.contrastive_evidence import (
+        ContrastFamily,
+        evaluate_recipe_on_family,
+        example_project_status_family,
+        store_dependency,
+    )
+    from z0int.autoresearch.mutations import treatment_hash
+
+    payload = _unwrap_payload(job)
+    if payload.get("family"):
+        family = ContrastFamily.from_dict(payload["family"])
+    else:
+        family = example_project_status_family()
+
+    champ_recipe = dict(payload.get("recipe_champion") or {"keep_necessary_only": False})
+    chal_recipe = dict(
+        payload.get("recipe_challenger")
+        or {
+            # cheaper: drop stale summary + unrelated chat
+            "drop_evidence_ids": ["old_summary", "unrelated_chat"],
+        }
+    )
+    champ_recipe.setdefault("role", "champion")
+    chal_recipe.setdefault("role", "challenger")
+    champ_recipe["treatment_hash"] = treatment_hash(champ_recipe)
+    chal_recipe["treatment_hash"] = treatment_hash(chal_recipe)
+
+    champ = evaluate_recipe_on_family(family, champ_recipe)
+    chal = evaluate_recipe_on_family(family, chal_recipe)
+
+    # store dependency from champion full_pass path
+    dep_path = store_dependency(champ["dependency"])
+
+    # decision: challenger must full_pass and use fewer evidence ids
+    champ_n = len(champ.get("recipe_keep_ids") or [])
+    chal_n = len(chal.get("recipe_keep_ids") or [])
+    if chal["full_pass"] and champ["full_pass"] and chal_n <= champ_n:
+        decision = "KEEP_CHEAPER_SENSITIVE_RECIPE"
+    elif not chal["full_pass"]:
+        decision = "REJECT_INSENSITIVE_OR_BRITTLE"
+    else:
+        decision = "NO_UPDATE"
+
+    out = {
+        "ok": True,
+        "job_id": job.get("id"),
+        "trace_id": job.get("trace_id"),
+        "kind": "contrastive_evidence",
+        "decision": decision,
+        "family_id": family.family_id,
+        "champion": {
+            "treatment_hash": champ_recipe["treatment_hash"],
+            "pair_pass": champ["pair_pass"],
+            "full_pass": champ["full_pass"],
+            "keep_ids": champ.get("recipe_keep_ids"),
+            "conditions": champ["conditions"],
+        },
+        "challenger": {
+            "treatment_hash": chal_recipe["treatment_hash"],
+            "pair_pass": chal["pair_pass"],
+            "full_pass": chal["full_pass"],
+            "keep_ids": chal.get("recipe_keep_ids"),
+            "conditions": chal["conditions"],
+        },
+        "dependency_path": str(dep_path),
+        # explicit: not production gold
+        "production_credit_eligible": False,
+        "curation_accepted": bool(chal["full_pass"] and champ["full_pass"]),
+    }
+    store.append_result(
+        {
+            "schema": "z0int.replay_result.v1",
+            "experiment_id": job.get("id"),
+            "task_snapshot_id": family.family_id,
+            "arm": "contrastive",
+            "treatment_hash": chal_recipe["treatment_hash"],
+            "execution_completed": True,
+            "verified_success": None,  # never promote curation → verified
+            "verifier_id": payload.get("verifier_id") or "contrastive_deterministic",
+            "wall_ms": 0,
+            "trace_id": job.get("trace_id"),
+            "extra": out,
+        }
+    )
+    return out
+

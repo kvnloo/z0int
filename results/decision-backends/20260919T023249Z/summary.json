@@ -1,0 +1,3324 @@
+{
+  "schema": "z0int.backends_bench.v1",
+  "contract": "decision-capability-v1",
+  "timestamp": "20260919T023249Z",
+  "seed": 0,
+  "fixtures_path": "/home/kvn/tmp/openjev/benchmarks/fixtures/decision-capability-v1/examples.jsonl",
+  "capabilities": [
+    "rlm.worker_needed",
+    "tool_family_select",
+    "retry_or_escalate",
+    "context_compress_needed",
+    "verification_needed"
+  ],
+  "candidates": [
+    "openjev_06b",
+    "decider_2b",
+    "nanojev_06b",
+    "laya_421m"
+  ],
+  "adapter_table": [
+    {
+      "candidate_id": "laya_421m",
+      "status": "available",
+      "reason": null,
+      "backend_impl": "laya",
+      "commercial_use": true,
+      "platforms": [
+        "cpu",
+        "mps",
+        "cuda"
+      ],
+      "license": "apache-2.0",
+      "optional": true,
+      "family": "decision_backend"
+    },
+    {
+      "candidate_id": "decider_2b",
+      "status": "available",
+      "reason": null,
+      "backend_impl": "decider",
+      "commercial_use": true,
+      "platforms": [
+        "cuda",
+        "mps"
+      ],
+      "license": "apache-2.0",
+      "optional": true,
+      "family": "decision_backend"
+    },
+    {
+      "candidate_id": "nanojev_06b",
+      "status": "available",
+      "reason": null,
+      "backend_impl": "nanojev",
+      "commercial_use": true,
+      "platforms": [
+        "cuda"
+      ],
+      "license": null,
+      "optional": false,
+      "family": "decision_backend"
+    },
+    {
+      "candidate_id": "reflex",
+      "status": "unavailable",
+      "reason": "browser_app; no headless DecisionBackend adapter for bench",
+      "backend_impl": null,
+      "commercial_use": null,
+      "platforms": [
+        "webgpu",
+        "browser"
+      ],
+      "license": null,
+      "optional": true,
+      "family": "decision_backend"
+    },
+    {
+      "candidate_id": "system_one_4b",
+      "status": "unavailable",
+      "reason": "manifest pin only; DecisionBackend adapter not implemented (CC-BY-NC-4.0 — non-commercial)",
+      "backend_impl": null,
+      "commercial_use": false,
+      "platforms": [
+        "cuda"
+      ],
+      "license": "cc-by-nc-4.0",
+      "optional": true,
+      "family": "decision_backend"
+    },
+    {
+      "candidate_id": "openjev_06b",
+      "status": "available",
+      "reason": null,
+      "backend_impl": "openjev_direct",
+      "commercial_use": true,
+      "platforms": [
+        "cuda",
+        "mps"
+      ],
+      "license": null,
+      "optional": false,
+      "family": "decision_backend"
+    },
+    {
+      "candidate_id": "openjev_4b",
+      "status": "available",
+      "reason": null,
+      "backend_impl": "openjev_direct",
+      "commercial_use": true,
+      "platforms": [
+        "cuda",
+        "mps"
+      ],
+      "license": null,
+      "optional": false,
+      "family": "decision_backend"
+    },
+    {
+      "candidate_id": "local_mb",
+      "status": "unavailable",
+      "reason": "generated mushroom_body specialist; no typed DecisionBackend adapter yet",
+      "backend_impl": null,
+      "commercial_use": true,
+      "platforms": [
+        "local"
+      ],
+      "license": null,
+      "optional": false,
+      "family": null
+    }
+  ],
+  "measurement": {
+    "canonical": "tokenomics-events.jsonl",
+    "materialized": "raw.jsonl",
+    "parity_ok": true,
+    "parity_errors": []
+  },
+  "eligibility": {
+    "schema": "z0int.backends_bench.eligibility.v1",
+    "competence_margin": 0.05,
+    "validated_min_examples": 50
+  },
+  "backends": [
+    {
+      "candidate_id": "openjev_06b",
+      "status": "available",
+      "commercial_use": true,
+      "platforms": [
+        "cuda",
+        "mps"
+      ],
+      "backend_impl": "openjev_direct",
+      "examples_total": 11,
+      "examples_ok": 11,
+      "examples_unavailable": 0,
+      "examples_error": 0,
+      "by_capability": {
+        "rlm.worker_needed": {
+          "denominator": 3,
+          "verified_accuracy": 0.6666666666666666,
+          "mean_brier": 0.6785553935961912,
+          "abstention_accuracy": 1.0,
+          "dangerous_false_rate": 0.3333333333333333,
+          "latency_ms_p50": 28.55783500126563,
+          "latency_ms_p95": 272.81660650041886,
+          "n": 3,
+          "trivial_baseline": 0.3333333333333333,
+          "competence_margin": 0.05,
+          "competence_threshold": 0.6,
+          "evidence_state": "PROVISIONAL",
+          "eligibility_status": "excluded_unsafe",
+          "ineligibility_reason": "dangerous_false",
+          "pareto_eligible": false,
+          "pareto_status": "excluded_unsafe"
+        },
+        "tool_family_select": {
+          "denominator": 2,
+          "verified_accuracy": 0.0,
+          "mean_brier": 1.591941033965047,
+          "abstention_accuracy": null,
+          "dangerous_false_rate": 0.0,
+          "latency_ms_p50": 29.906059498898685,
+          "latency_ms_p95": 31.12876845189021,
+          "n": 2,
+          "trivial_baseline": 0.125,
+          "competence_margin": 0.05,
+          "competence_threshold": 0.175,
+          "evidence_state": "PROVISIONAL",
+          "eligibility_status": "measured_but_ineligible",
+          "ineligibility_reason": "below_competence_floor",
+          "pareto_eligible": false,
+          "pareto_status": "measured_but_ineligible"
+        },
+        "retry_or_escalate": {
+          "denominator": 2,
+          "verified_accuracy": 0.5,
+          "mean_brier": 0.9998524115008696,
+          "abstention_accuracy": null,
+          "dangerous_false_rate": 0.5,
+          "latency_ms_p50": 29.70771949912887,
+          "latency_ms_p95": 30.073262154473923,
+          "n": 2,
+          "trivial_baseline": 0.25,
+          "competence_margin": 0.05,
+          "competence_threshold": 0.5,
+          "evidence_state": "PROVISIONAL",
+          "eligibility_status": "excluded_unsafe",
+          "ineligibility_reason": "dangerous_false",
+          "pareto_eligible": false,
+          "pareto_status": "excluded_unsafe"
+        },
+        "context_compress_needed": {
+          "denominator": 2,
+          "verified_accuracy": 0.5,
+          "mean_brier": 0.9999989381480583,
+          "abstention_accuracy": null,
+          "dangerous_false_rate": 0.0,
+          "latency_ms_p50": 29.107972997735487,
+          "latency_ms_p95": 29.767332794654067,
+          "n": 2,
+          "trivial_baseline": 0.3333333333333333,
+          "competence_margin": 0.05,
+          "competence_threshold": 0.3833333333333333,
+          "evidence_state": "PROVISIONAL",
+          "eligibility_status": "measured_but_ineligible",
+          "ineligibility_reason": "provisional_evidence",
+          "pareto_eligible": false,
+          "pareto_status": "measured_but_ineligible"
+        },
+        "verification_needed": {
+          "denominator": 2,
+          "verified_accuracy": 0.5,
+          "mean_brier": 0.9806773107883173,
+          "abstention_accuracy": null,
+          "dangerous_false_rate": 0.0,
+          "latency_ms_p50": 32.90241650029202,
+          "latency_ms_p95": 37.45575275133888,
+          "n": 2,
+          "trivial_baseline": 0.5,
+          "competence_margin": 0.05,
+          "competence_threshold": 0.55,
+          "evidence_state": "PROVISIONAL",
+          "eligibility_status": "measured_but_ineligible",
+          "ineligibility_reason": "below_competence_floor",
+          "pareto_eligible": false,
+          "pareto_status": "measured_but_ineligible"
+        }
+      },
+      "latency_ms_p50": 29.301560993189923,
+      "latency_ms_p95": 168.95907450088998,
+      "startup_ms_p50": 6643.251567998959,
+      "throughput_rps": 18.336334777693295,
+      "vram_mb_peak": 2907.0,
+      "ram_mb_peak": 2331.2578125,
+      "eligibility_by_capability": {
+        "rlm.worker_needed": {
+          "capability": "rlm.worker_needed",
+          "n": 3,
+          "verified_accuracy": 0.6666666666666666,
+          "trivial_baseline": 0.3333333333333333,
+          "competence_margin": 0.05,
+          "competence_threshold": 0.6,
+          "dangerous_false_rate": 0.3333333333333333,
+          "mean_brier": 0.6785553935961912,
+          "latency_ms_p50": 28.55783500126563,
+          "latency_ms_p95": 272.81660650041886,
+          "evidence_state": "PROVISIONAL",
+          "eligibility_status": "excluded_unsafe",
+          "ineligibility_reason": "dangerous_false",
+          "pareto_eligible": false,
+          "pareto_status": "excluded_unsafe"
+        },
+        "tool_family_select": {
+          "capability": "tool_family_select",
+          "n": 2,
+          "verified_accuracy": 0.0,
+          "trivial_baseline": 0.125,
+          "competence_margin": 0.05,
+          "competence_threshold": 0.175,
+          "dangerous_false_rate": 0.0,
+          "mean_brier": 1.591941033965047,
+          "latency_ms_p50": 29.906059498898685,
+          "latency_ms_p95": 31.12876845189021,
+          "evidence_state": "PROVISIONAL",
+          "eligibility_status": "measured_but_ineligible",
+          "ineligibility_reason": "below_competence_floor",
+          "pareto_eligible": false,
+          "pareto_status": "measured_but_ineligible"
+        },
+        "retry_or_escalate": {
+          "capability": "retry_or_escalate",
+          "n": 2,
+          "verified_accuracy": 0.5,
+          "trivial_baseline": 0.25,
+          "competence_margin": 0.05,
+          "competence_threshold": 0.5,
+          "dangerous_false_rate": 0.5,
+          "mean_brier": 0.9998524115008696,
+          "latency_ms_p50": 29.70771949912887,
+          "latency_ms_p95": 30.073262154473923,
+          "evidence_state": "PROVISIONAL",
+          "eligibility_status": "excluded_unsafe",
+          "ineligibility_reason": "dangerous_false",
+          "pareto_eligible": false,
+          "pareto_status": "excluded_unsafe"
+        },
+        "context_compress_needed": {
+          "capability": "context_compress_needed",
+          "n": 2,
+          "verified_accuracy": 0.5,
+          "trivial_baseline": 0.3333333333333333,
+          "competence_margin": 0.05,
+          "competence_threshold": 0.3833333333333333,
+          "dangerous_false_rate": 0.0,
+          "mean_brier": 0.9999989381480583,
+          "latency_ms_p50": 29.107972997735487,
+          "latency_ms_p95": 29.767332794654067,
+          "evidence_state": "PROVISIONAL",
+          "eligibility_status": "measured_but_ineligible",
+          "ineligibility_reason": "provisional_evidence",
+          "pareto_eligible": false,
+          "pareto_status": "measured_but_ineligible"
+        },
+        "verification_needed": {
+          "capability": "verification_needed",
+          "n": 2,
+          "verified_accuracy": 0.5,
+          "trivial_baseline": 0.5,
+          "competence_margin": 0.05,
+          "competence_threshold": 0.55,
+          "dangerous_false_rate": 0.0,
+          "mean_brier": 0.9806773107883173,
+          "latency_ms_p50": 32.90241650029202,
+          "latency_ms_p95": 37.45575275133888,
+          "evidence_state": "PROVISIONAL",
+          "eligibility_status": "measured_but_ineligible",
+          "ineligibility_reason": "below_competence_floor",
+          "pareto_eligible": false,
+          "pareto_status": "measured_but_ineligible"
+        }
+      }
+    },
+    {
+      "candidate_id": "decider_2b",
+      "status": "available",
+      "commercial_use": true,
+      "platforms": [
+        "cuda",
+        "mps"
+      ],
+      "backend_impl": "decider",
+      "examples_total": 11,
+      "examples_ok": 11,
+      "examples_unavailable": 0,
+      "examples_error": 0,
+      "by_capability": {
+        "rlm.worker_needed": {
+          "denominator": 3,
+          "verified_accuracy": 0.6666666666666666,
+          "mean_brier": 0.49194733333333335,
+          "abstention_accuracy": 0.0,
+          "dangerous_false_rate": 0.0,
+          "latency_ms_p50": 50.87744499905966,
+          "latency_ms_p95": 1087.7490642968041,
+          "n": 3,
+          "trivial_baseline": 0.3333333333333333,
+          "competence_margin": 0.05,
+          "competence_threshold": 0.6,
+          "evidence_state": "PROVISIONAL",
+          "eligibility_status": "measured_but_ineligible",
+          "ineligibility_reason": "provisional_evidence",
+          "pareto_eligible": false,
+          "pareto_status": "measured_but_ineligible"
+        },
+        "tool_family_select": {
+          "denominator": 2,
+          "verified_accuracy": 1.0,
+          "mean_brier": 0.037953430306527,
+          "abstention_accuracy": null,
+          "dangerous_false_rate": 0.0,
+          "latency_ms_p50": 50.394249497912824,
+          "latency_ms_p95": 50.43795484962175,
+          "n": 2,
+          "trivial_baseline": 0.125,
+          "competence_margin": 0.05,
+          "competence_threshold": 0.175,
+          "evidence_state": "PROVISIONAL",
+          "eligibility_status": "measured_but_ineligible",
+          "ineligibility_reason": "provisional_evidence",
+          "pareto_eligible": false,
+          "pareto_status": "measured_but_ineligible"
+        },
+        "retry_or_escalate": {
+          "denominator": 2,
+          "verified_accuracy": 0.5,
+          "mean_brier": 0.5604133817195223,
+          "abstention_accuracy": null,
+          "dangerous_false_rate": 0.5,
+          "latency_ms_p50": 49.24413999833632,
+          "latency_ms_p95": 50.291863298480166,
+          "n": 2,
+          "trivial_baseline": 0.25,
+          "competence_margin": 0.05,
+          "competence_threshold": 0.5,
+          "evidence_state": "PROVISIONAL",
+          "eligibility_status": "excluded_unsafe",
+          "ineligibility_reason": "dangerous_false",
+          "pareto_eligible": false,
+          "pareto_status": "excluded_unsafe"
+        },
+        "context_compress_needed": {
+          "denominator": 2,
+          "verified_accuracy": 0.5,
+          "mean_brier": 0.6150460799999999,
+          "abstention_accuracy": null,
+          "dangerous_false_rate": 0.0,
+          "latency_ms_p50": 49.89746700084652,
+          "latency_ms_p95": 52.18186410384078,
+          "n": 2,
+          "trivial_baseline": 0.3333333333333333,
+          "competence_margin": 0.05,
+          "competence_threshold": 0.3833333333333333,
+          "evidence_state": "PROVISIONAL",
+          "eligibility_status": "measured_but_ineligible",
+          "ineligibility_reason": "provisional_evidence",
+          "pareto_eligible": false,
+          "pareto_status": "measured_but_ineligible"
+        },
+        "verification_needed": {
+          "denominator": 2,
+          "verified_accuracy": 0.5,
+          "mean_brier": 0.4736457700000001,
+          "abstention_accuracy": null,
+          "dangerous_false_rate": 0.0,
+          "latency_ms_p50": 54.6965560024546,
+          "latency_ms_p95": 55.54612719897705,
+          "n": 2,
+          "trivial_baseline": 0.5,
+          "competence_margin": 0.05,
+          "competence_threshold": 0.55,
+          "evidence_state": "PROVISIONAL",
+          "eligibility_status": "measured_but_ineligible",
+          "ineligibility_reason": "below_competence_floor",
+          "pareto_eligible": false,
+          "pareto_status": "measured_but_ineligible"
+        }
+      },
+      "latency_ms_p50": 50.44281099981163,
+      "latency_ms_p95": 629.2987729975721,
+      "startup_ms_p50": 9854.713323002215,
+      "throughput_rps": 6.429688577802994,
+      "vram_mb_peak": 5011.0,
+      "ram_mb_peak": 5321.05859375,
+      "eligibility_by_capability": {
+        "rlm.worker_needed": {
+          "capability": "rlm.worker_needed",
+          "n": 3,
+          "verified_accuracy": 0.6666666666666666,
+          "trivial_baseline": 0.3333333333333333,
+          "competence_margin": 0.05,
+          "competence_threshold": 0.6,
+          "dangerous_false_rate": 0.0,
+          "mean_brier": 0.49194733333333335,
+          "latency_ms_p50": 50.87744499905966,
+          "latency_ms_p95": 1087.7490642968041,
+          "evidence_state": "PROVISIONAL",
+          "eligibility_status": "measured_but_ineligible",
+          "ineligibility_reason": "provisional_evidence",
+          "pareto_eligible": false,
+          "pareto_status": "measured_but_ineligible"
+        },
+        "tool_family_select": {
+          "capability": "tool_family_select",
+          "n": 2,
+          "verified_accuracy": 1.0,
+          "trivial_baseline": 0.125,
+          "competence_margin": 0.05,
+          "competence_threshold": 0.175,
+          "dangerous_false_rate": 0.0,
+          "mean_brier": 0.037953430306527,
+          "latency_ms_p50": 50.394249497912824,
+          "latency_ms_p95": 50.43795484962175,
+          "evidence_state": "PROVISIONAL",
+          "eligibility_status": "measured_but_ineligible",
+          "ineligibility_reason": "provisional_evidence",
+          "pareto_eligible": false,
+          "pareto_status": "measured_but_ineligible"
+        },
+        "retry_or_escalate": {
+          "capability": "retry_or_escalate",
+          "n": 2,
+          "verified_accuracy": 0.5,
+          "trivial_baseline": 0.25,
+          "competence_margin": 0.05,
+          "competence_threshold": 0.5,
+          "dangerous_false_rate": 0.5,
+          "mean_brier": 0.5604133817195223,
+          "latency_ms_p50": 49.24413999833632,
+          "latency_ms_p95": 50.291863298480166,
+          "evidence_state": "PROVISIONAL",
+          "eligibility_status": "excluded_unsafe",
+          "ineligibility_reason": "dangerous_false",
+          "pareto_eligible": false,
+          "pareto_status": "excluded_unsafe"
+        },
+        "context_compress_needed": {
+          "capability": "context_compress_needed",
+          "n": 2,
+          "verified_accuracy": 0.5,
+          "trivial_baseline": 0.3333333333333333,
+          "competence_margin": 0.05,
+          "competence_threshold": 0.3833333333333333,
+          "dangerous_false_rate": 0.0,
+          "mean_brier": 0.6150460799999999,
+          "latency_ms_p50": 49.89746700084652,
+          "latency_ms_p95": 52.18186410384078,
+          "evidence_state": "PROVISIONAL",
+          "eligibility_status": "measured_but_ineligible",
+          "ineligibility_reason": "provisional_evidence",
+          "pareto_eligible": false,
+          "pareto_status": "measured_but_ineligible"
+        },
+        "verification_needed": {
+          "capability": "verification_needed",
+          "n": 2,
+          "verified_accuracy": 0.5,
+          "trivial_baseline": 0.5,
+          "competence_margin": 0.05,
+          "competence_threshold": 0.55,
+          "dangerous_false_rate": 0.0,
+          "mean_brier": 0.4736457700000001,
+          "latency_ms_p50": 54.6965560024546,
+          "latency_ms_p95": 55.54612719897705,
+          "evidence_state": "PROVISIONAL",
+          "eligibility_status": "measured_but_ineligible",
+          "ineligibility_reason": "below_competence_floor",
+          "pareto_eligible": false,
+          "pareto_status": "measured_but_ineligible"
+        }
+      }
+    },
+    {
+      "candidate_id": "nanojev_06b",
+      "status": "available",
+      "commercial_use": true,
+      "platforms": [
+        "cuda"
+      ],
+      "backend_impl": "nanojev",
+      "examples_total": 11,
+      "examples_ok": 11,
+      "examples_unavailable": 0,
+      "examples_error": 0,
+      "by_capability": {
+        "rlm.worker_needed": {
+          "denominator": 3,
+          "verified_accuracy": 0.3333333333333333,
+          "mean_brier": 0.8946525939897303,
+          "abstention_accuracy": 0.0,
+          "dangerous_false_rate": 0.3333333333333333,
+          "latency_ms_p50": 35.063941999396775,
+          "latency_ms_p95": 85.1524186968163,
+          "n": 3,
+          "trivial_baseline": 0.3333333333333333,
+          "competence_margin": 0.05,
+          "competence_threshold": 0.6,
+          "evidence_state": "PROVISIONAL",
+          "eligibility_status": "excluded_unsafe",
+          "ineligibility_reason": "dangerous_false",
+          "pareto_eligible": false,
+          "pareto_status": "excluded_unsafe"
+        },
+        "tool_family_select": {
+          "denominator": 2,
+          "verified_accuracy": 0.0,
+          "mean_brier": 0.9790735376904749,
+          "abstention_accuracy": null,
+          "dangerous_false_rate": 0.0,
+          "latency_ms_p50": 36.20248450170038,
+          "latency_ms_p95": 36.547540449828375,
+          "n": 2,
+          "trivial_baseline": 0.125,
+          "competence_margin": 0.05,
+          "competence_threshold": 0.175,
+          "evidence_state": "PROVISIONAL",
+          "eligibility_status": "measured_but_ineligible",
+          "ineligibility_reason": "below_competence_floor",
+          "pareto_eligible": false,
+          "pareto_status": "measured_but_ineligible"
+        },
+        "retry_or_escalate": {
+          "denominator": 2,
+          "verified_accuracy": 0.5,
+          "mean_brier": 0.5467185305402534,
+          "abstention_accuracy": null,
+          "dangerous_false_rate": 0.5,
+          "latency_ms_p50": 35.11195250030141,
+          "latency_ms_p95": 36.361534548632335,
+          "n": 2,
+          "trivial_baseline": 0.25,
+          "competence_margin": 0.05,
+          "competence_threshold": 0.5,
+          "evidence_state": "PROVISIONAL",
+          "eligibility_status": "excluded_unsafe",
+          "ineligibility_reason": "dangerous_false",
+          "pareto_eligible": false,
+          "pareto_status": "excluded_unsafe"
+        },
+        "context_compress_needed": {
+          "denominator": 2,
+          "verified_accuracy": 0.5,
+          "mean_brier": 0.7716871151178983,
+          "abstention_accuracy": null,
+          "dangerous_false_rate": 0.0,
+          "latency_ms_p50": 36.61760150134796,
+          "latency_ms_p95": 37.9580529537634,
+          "n": 2,
+          "trivial_baseline": 0.3333333333333333,
+          "competence_margin": 0.05,
+          "competence_threshold": 0.3833333333333333,
+          "evidence_state": "PROVISIONAL",
+          "eligibility_status": "measured_but_ineligible",
+          "ineligibility_reason": "provisional_evidence",
+          "pareto_eligible": false,
+          "pareto_status": "measured_but_ineligible"
+        },
+        "verification_needed": {
+          "denominator": 2,
+          "verified_accuracy": 0.5,
+          "mean_brier": 0.6038949747068934,
+          "abstention_accuracy": null,
+          "dangerous_false_rate": 0.0,
+          "latency_ms_p50": 32.092242494400125,
+          "latency_ms_p95": 32.50437274327851,
+          "n": 2,
+          "trivial_baseline": 0.5,
+          "competence_margin": 0.05,
+          "competence_threshold": 0.55,
+          "evidence_state": "PROVISIONAL",
+          "eligibility_status": "measured_but_ineligible",
+          "ineligibility_reason": "below_competence_floor",
+          "pareto_eligible": false,
+          "pareto_status": "measured_but_ineligible"
+        }
+      },
+      "latency_ms_p50": 35.128210998664144,
+      "latency_ms_p95": 64.41239850028069,
+      "startup_ms_p50": 14076.39072999882,
+      "throughput_rps": 24.972410367972092,
+      "vram_mb_peak": 4529.0,
+      "ram_mb_peak": 6451.109375,
+      "eligibility_by_capability": {
+        "rlm.worker_needed": {
+          "capability": "rlm.worker_needed",
+          "n": 3,
+          "verified_accuracy": 0.3333333333333333,
+          "trivial_baseline": 0.3333333333333333,
+          "competence_margin": 0.05,
+          "competence_threshold": 0.6,
+          "dangerous_false_rate": 0.3333333333333333,
+          "mean_brier": 0.8946525939897303,
+          "latency_ms_p50": 35.063941999396775,
+          "latency_ms_p95": 85.1524186968163,
+          "evidence_state": "PROVISIONAL",
+          "eligibility_status": "excluded_unsafe",
+          "ineligibility_reason": "dangerous_false",
+          "pareto_eligible": false,
+          "pareto_status": "excluded_unsafe"
+        },
+        "tool_family_select": {
+          "capability": "tool_family_select",
+          "n": 2,
+          "verified_accuracy": 0.0,
+          "trivial_baseline": 0.125,
+          "competence_margin": 0.05,
+          "competence_threshold": 0.175,
+          "dangerous_false_rate": 0.0,
+          "mean_brier": 0.9790735376904749,
+          "latency_ms_p50": 36.20248450170038,
+          "latency_ms_p95": 36.547540449828375,
+          "evidence_state": "PROVISIONAL",
+          "eligibility_status": "measured_but_ineligible",
+          "ineligibility_reason": "below_competence_floor",
+          "pareto_eligible": false,
+          "pareto_status": "measured_but_ineligible"
+        },
+        "retry_or_escalate": {
+          "capability": "retry_or_escalate",
+          "n": 2,
+          "verified_accuracy": 0.5,
+          "trivial_baseline": 0.25,
+          "competence_margin": 0.05,
+          "competence_threshold": 0.5,
+          "dangerous_false_rate": 0.5,
+          "mean_brier": 0.5467185305402534,
+          "latency_ms_p50": 35.11195250030141,
+          "latency_ms_p95": 36.361534548632335,
+          "evidence_state": "PROVISIONAL",
+          "eligibility_status": "excluded_unsafe",
+          "ineligibility_reason": "dangerous_false",
+          "pareto_eligible": false,
+          "pareto_status": "excluded_unsafe"
+        },
+        "context_compress_needed": {
+          "capability": "context_compress_needed",
+          "n": 2,
+          "verified_accuracy": 0.5,
+          "trivial_baseline": 0.3333333333333333,
+          "competence_margin": 0.05,
+          "competence_threshold": 0.3833333333333333,
+          "dangerous_false_rate": 0.0,
+          "mean_brier": 0.7716871151178983,
+          "latency_ms_p50": 36.61760150134796,
+          "latency_ms_p95": 37.9580529537634,
+          "evidence_state": "PROVISIONAL",
+          "eligibility_status": "measured_but_ineligible",
+          "ineligibility_reason": "provisional_evidence",
+          "pareto_eligible": false,
+          "pareto_status": "measured_but_ineligible"
+        },
+        "verification_needed": {
+          "capability": "verification_needed",
+          "n": 2,
+          "verified_accuracy": 0.5,
+          "trivial_baseline": 0.5,
+          "competence_margin": 0.05,
+          "competence_threshold": 0.55,
+          "dangerous_false_rate": 0.0,
+          "mean_brier": 0.6038949747068934,
+          "latency_ms_p50": 32.092242494400125,
+          "latency_ms_p95": 32.50437274327851,
+          "evidence_state": "PROVISIONAL",
+          "eligibility_status": "measured_but_ineligible",
+          "ineligibility_reason": "below_competence_floor",
+          "pareto_eligible": false,
+          "pareto_status": "measured_but_ineligible"
+        }
+      }
+    },
+    {
+      "candidate_id": "laya_421m",
+      "status": "available",
+      "commercial_use": true,
+      "platforms": [
+        "cpu",
+        "mps",
+        "cuda"
+      ],
+      "backend_impl": "laya",
+      "examples_total": 11,
+      "examples_ok": 11,
+      "examples_unavailable": 0,
+      "examples_error": 0,
+      "by_capability": {
+        "rlm.worker_needed": {
+          "denominator": 3,
+          "verified_accuracy": 0.3333333333333333,
+          "mean_brier": 0.6353848084751358,
+          "abstention_accuracy": 0.0,
+          "dangerous_false_rate": 0.0,
+          "latency_ms_p50": 296.89219599822536,
+          "latency_ms_p95": 343.88979909999756,
+          "n": 3,
+          "trivial_baseline": 0.3333333333333333,
+          "competence_margin": 0.05,
+          "competence_threshold": 0.6,
+          "evidence_state": "PROVISIONAL",
+          "eligibility_status": "measured_but_ineligible",
+          "ineligibility_reason": "below_competence_floor",
+          "pareto_eligible": false,
+          "pareto_status": "measured_but_ineligible"
+        },
+        "tool_family_select": {
+          "denominator": 2,
+          "verified_accuracy": 1.0,
+          "mean_brier": 0.25380534452935716,
+          "abstention_accuracy": null,
+          "dangerous_false_rate": 0.0,
+          "latency_ms_p50": 304.57272049898165,
+          "latency_ms_p95": 307.9803756536421,
+          "n": 2,
+          "trivial_baseline": 0.125,
+          "competence_margin": 0.05,
+          "competence_threshold": 0.175,
+          "evidence_state": "PROVISIONAL",
+          "eligibility_status": "measured_but_ineligible",
+          "ineligibility_reason": "provisional_evidence",
+          "pareto_eligible": false,
+          "pareto_status": "measured_but_ineligible"
+        },
+        "retry_or_escalate": {
+          "denominator": 2,
+          "verified_accuracy": 0.5,
+          "mean_brier": 0.8889354943698461,
+          "abstention_accuracy": null,
+          "dangerous_false_rate": 0.5,
+          "latency_ms_p50": 262.5832329977129,
+          "latency_ms_p95": 262.6355517993943,
+          "n": 2,
+          "trivial_baseline": 0.25,
+          "competence_margin": 0.05,
+          "competence_threshold": 0.5,
+          "evidence_state": "PROVISIONAL",
+          "eligibility_status": "excluded_unsafe",
+          "ineligibility_reason": "dangerous_false",
+          "pareto_eligible": false,
+          "pareto_status": "excluded_unsafe"
+        },
+        "context_compress_needed": {
+          "denominator": 2,
+          "verified_accuracy": 0.0,
+          "mean_brier": 0.7103615134978617,
+          "abstention_accuracy": null,
+          "dangerous_false_rate": 0.0,
+          "latency_ms_p50": 243.9155665015278,
+          "latency_ms_p95": 248.0245313494379,
+          "n": 2,
+          "trivial_baseline": 0.3333333333333333,
+          "competence_margin": 0.05,
+          "competence_threshold": 0.3833333333333333,
+          "evidence_state": "PROVISIONAL",
+          "eligibility_status": "measured_but_ineligible",
+          "ineligibility_reason": "below_competence_floor",
+          "pareto_eligible": false,
+          "pareto_status": "measured_but_ineligible"
+        },
+        "verification_needed": {
+          "denominator": 2,
+          "verified_accuracy": 1.0,
+          "mean_brier": 0.3653653,
+          "abstention_accuracy": null,
+          "dangerous_false_rate": 0.0,
+          "latency_ms_p50": 228.62499750044663,
+          "latency_ms_p95": 230.72387084539514,
+          "n": 2,
+          "trivial_baseline": 0.5,
+          "competence_margin": 0.05,
+          "competence_threshold": 0.55,
+          "evidence_state": "PROVISIONAL",
+          "eligibility_status": "measured_but_ineligible",
+          "ineligibility_reason": "provisional_evidence",
+          "pareto_eligible": false,
+          "pareto_status": "measured_but_ineligible"
+        }
+      },
+      "latency_ms_p50": 262.5251009958447,
+      "latency_ms_p95": 328.73537950217724,
+      "startup_ms_p50": 6869.129919003171,
+      "throughput_rps": 3.6985451945304355,
+      "vram_mb_peak": 1465.0,
+      "ram_mb_peak": 6451.109375,
+      "eligibility_by_capability": {
+        "rlm.worker_needed": {
+          "capability": "rlm.worker_needed",
+          "n": 3,
+          "verified_accuracy": 0.3333333333333333,
+          "trivial_baseline": 0.3333333333333333,
+          "competence_margin": 0.05,
+          "competence_threshold": 0.6,
+          "dangerous_false_rate": 0.0,
+          "mean_brier": 0.6353848084751358,
+          "latency_ms_p50": 296.89219599822536,
+          "latency_ms_p95": 343.88979909999756,
+          "evidence_state": "PROVISIONAL",
+          "eligibility_status": "measured_but_ineligible",
+          "ineligibility_reason": "below_competence_floor",
+          "pareto_eligible": false,
+          "pareto_status": "measured_but_ineligible"
+        },
+        "tool_family_select": {
+          "capability": "tool_family_select",
+          "n": 2,
+          "verified_accuracy": 1.0,
+          "trivial_baseline": 0.125,
+          "competence_margin": 0.05,
+          "competence_threshold": 0.175,
+          "dangerous_false_rate": 0.0,
+          "mean_brier": 0.25380534452935716,
+          "latency_ms_p50": 304.57272049898165,
+          "latency_ms_p95": 307.9803756536421,
+          "evidence_state": "PROVISIONAL",
+          "eligibility_status": "measured_but_ineligible",
+          "ineligibility_reason": "provisional_evidence",
+          "pareto_eligible": false,
+          "pareto_status": "measured_but_ineligible"
+        },
+        "retry_or_escalate": {
+          "capability": "retry_or_escalate",
+          "n": 2,
+          "verified_accuracy": 0.5,
+          "trivial_baseline": 0.25,
+          "competence_margin": 0.05,
+          "competence_threshold": 0.5,
+          "dangerous_false_rate": 0.5,
+          "mean_brier": 0.8889354943698461,
+          "latency_ms_p50": 262.5832329977129,
+          "latency_ms_p95": 262.6355517993943,
+          "evidence_state": "PROVISIONAL",
+          "eligibility_status": "excluded_unsafe",
+          "ineligibility_reason": "dangerous_false",
+          "pareto_eligible": false,
+          "pareto_status": "excluded_unsafe"
+        },
+        "context_compress_needed": {
+          "capability": "context_compress_needed",
+          "n": 2,
+          "verified_accuracy": 0.0,
+          "trivial_baseline": 0.3333333333333333,
+          "competence_margin": 0.05,
+          "competence_threshold": 0.3833333333333333,
+          "dangerous_false_rate": 0.0,
+          "mean_brier": 0.7103615134978617,
+          "latency_ms_p50": 243.9155665015278,
+          "latency_ms_p95": 248.0245313494379,
+          "evidence_state": "PROVISIONAL",
+          "eligibility_status": "measured_but_ineligible",
+          "ineligibility_reason": "below_competence_floor",
+          "pareto_eligible": false,
+          "pareto_status": "measured_but_ineligible"
+        },
+        "verification_needed": {
+          "capability": "verification_needed",
+          "n": 2,
+          "verified_accuracy": 1.0,
+          "trivial_baseline": 0.5,
+          "competence_margin": 0.05,
+          "competence_threshold": 0.55,
+          "dangerous_false_rate": 0.0,
+          "mean_brier": 0.3653653,
+          "latency_ms_p50": 228.62499750044663,
+          "latency_ms_p95": 230.72387084539514,
+          "evidence_state": "PROVISIONAL",
+          "eligibility_status": "measured_but_ineligible",
+          "ineligibility_reason": "provisional_evidence",
+          "pareto_eligible": false,
+          "pareto_status": "measured_but_ineligible"
+        }
+      }
+    }
+  ],
+  "pareto": {
+    "schema": "z0int.backends_bench.pareto.v2",
+    "contract": "decision-capability-v1",
+    "note": "No universal winner declared. Dominance is per-capability only. Pareto runs over pareto_eligible candidates (safe + competent + VALIDATED evidence).",
+    "by_capability": {
+      "rlm.worker_needed": {
+        "pareto_optimal": [],
+        "dominated_by": {},
+        "excluded_unsafe": [
+          "openjev_06b",
+          "nanojev_06b"
+        ],
+        "measured_but_ineligible": [
+          "decider_2b",
+          "laya_421m"
+        ],
+        "capability_baselines": {
+          "capability": "rlm.worker_needed",
+          "fixture_count": 3,
+          "trivial_baseline": 0.3333333333333333,
+          "per_fixture_baselines": [
+            {
+              "fixture_id": "rlm.worker_needed/native_sufficient",
+              "option_count": 3,
+              "baseline": 0.3333333333333333
+            },
+            {
+              "fixture_id": "rlm.worker_needed/worker_required",
+              "option_count": 3,
+              "baseline": 0.3333333333333333
+            },
+            {
+              "fixture_id": "rlm.worker_needed/uncertain_abstain",
+              "option_count": 3,
+              "baseline": 0.3333333333333333
+            }
+          ],
+          "competence_margin": 0.05,
+          "competence_threshold": 0.6,
+          "validated_min_examples": 50
+        },
+        "strata": {
+          "openjev_06b": {
+            "denominator": 3,
+            "verified_accuracy": 0.6666666666666666,
+            "mean_brier": 0.6785553935961912,
+            "abstention_accuracy": 1.0,
+            "dangerous_false_rate": 0.3333333333333333,
+            "latency_ms_p50": 28.55783500126563,
+            "latency_ms_p95": 272.81660650041886,
+            "n": 3,
+            "trivial_baseline": 0.3333333333333333,
+            "competence_margin": 0.05,
+            "competence_threshold": 0.6,
+            "evidence_state": "PROVISIONAL",
+            "eligibility_status": "excluded_unsafe",
+            "ineligibility_reason": "dangerous_false",
+            "pareto_eligible": false,
+            "pareto_status": "excluded_unsafe"
+          },
+          "decider_2b": {
+            "denominator": 3,
+            "verified_accuracy": 0.6666666666666666,
+            "mean_brier": 0.49194733333333335,
+            "abstention_accuracy": 0.0,
+            "dangerous_false_rate": 0.0,
+            "latency_ms_p50": 50.87744499905966,
+            "latency_ms_p95": 1087.7490642968041,
+            "n": 3,
+            "trivial_baseline": 0.3333333333333333,
+            "competence_margin": 0.05,
+            "competence_threshold": 0.6,
+            "evidence_state": "PROVISIONAL",
+            "eligibility_status": "measured_but_ineligible",
+            "ineligibility_reason": "provisional_evidence",
+            "pareto_eligible": false,
+            "pareto_status": "measured_but_ineligible"
+          },
+          "nanojev_06b": {
+            "denominator": 3,
+            "verified_accuracy": 0.3333333333333333,
+            "mean_brier": 0.8946525939897303,
+            "abstention_accuracy": 0.0,
+            "dangerous_false_rate": 0.3333333333333333,
+            "latency_ms_p50": 35.063941999396775,
+            "latency_ms_p95": 85.1524186968163,
+            "n": 3,
+            "trivial_baseline": 0.3333333333333333,
+            "competence_margin": 0.05,
+            "competence_threshold": 0.6,
+            "evidence_state": "PROVISIONAL",
+            "eligibility_status": "excluded_unsafe",
+            "ineligibility_reason": "dangerous_false",
+            "pareto_eligible": false,
+            "pareto_status": "excluded_unsafe"
+          },
+          "laya_421m": {
+            "denominator": 3,
+            "verified_accuracy": 0.3333333333333333,
+            "mean_brier": 0.6353848084751358,
+            "abstention_accuracy": 0.0,
+            "dangerous_false_rate": 0.0,
+            "latency_ms_p50": 296.89219599822536,
+            "latency_ms_p95": 343.88979909999756,
+            "n": 3,
+            "trivial_baseline": 0.3333333333333333,
+            "competence_margin": 0.05,
+            "competence_threshold": 0.6,
+            "evidence_state": "PROVISIONAL",
+            "eligibility_status": "measured_but_ineligible",
+            "ineligibility_reason": "below_competence_floor",
+            "pareto_eligible": false,
+            "pareto_status": "measured_but_ineligible"
+          }
+        },
+        "eligibility": {
+          "openjev_06b": {
+            "capability": "rlm.worker_needed",
+            "n": 3,
+            "verified_accuracy": 0.6666666666666666,
+            "trivial_baseline": 0.3333333333333333,
+            "competence_margin": 0.05,
+            "competence_threshold": 0.6,
+            "dangerous_false_rate": 0.3333333333333333,
+            "mean_brier": 0.6785553935961912,
+            "latency_ms_p50": 28.55783500126563,
+            "latency_ms_p95": 272.81660650041886,
+            "evidence_state": "PROVISIONAL",
+            "eligibility_status": "excluded_unsafe",
+            "ineligibility_reason": "dangerous_false",
+            "pareto_eligible": false,
+            "pareto_status": "excluded_unsafe"
+          },
+          "decider_2b": {
+            "capability": "rlm.worker_needed",
+            "n": 3,
+            "verified_accuracy": 0.6666666666666666,
+            "trivial_baseline": 0.3333333333333333,
+            "competence_margin": 0.05,
+            "competence_threshold": 0.6,
+            "dangerous_false_rate": 0.0,
+            "mean_brier": 0.49194733333333335,
+            "latency_ms_p50": 50.87744499905966,
+            "latency_ms_p95": 1087.7490642968041,
+            "evidence_state": "PROVISIONAL",
+            "eligibility_status": "measured_but_ineligible",
+            "ineligibility_reason": "provisional_evidence",
+            "pareto_eligible": false,
+            "pareto_status": "measured_but_ineligible"
+          },
+          "nanojev_06b": {
+            "capability": "rlm.worker_needed",
+            "n": 3,
+            "verified_accuracy": 0.3333333333333333,
+            "trivial_baseline": 0.3333333333333333,
+            "competence_margin": 0.05,
+            "competence_threshold": 0.6,
+            "dangerous_false_rate": 0.3333333333333333,
+            "mean_brier": 0.8946525939897303,
+            "latency_ms_p50": 35.063941999396775,
+            "latency_ms_p95": 85.1524186968163,
+            "evidence_state": "PROVISIONAL",
+            "eligibility_status": "excluded_unsafe",
+            "ineligibility_reason": "dangerous_false",
+            "pareto_eligible": false,
+            "pareto_status": "excluded_unsafe"
+          },
+          "laya_421m": {
+            "capability": "rlm.worker_needed",
+            "n": 3,
+            "verified_accuracy": 0.3333333333333333,
+            "trivial_baseline": 0.3333333333333333,
+            "competence_margin": 0.05,
+            "competence_threshold": 0.6,
+            "dangerous_false_rate": 0.0,
+            "mean_brier": 0.6353848084751358,
+            "latency_ms_p50": 296.89219599822536,
+            "latency_ms_p95": 343.88979909999756,
+            "evidence_state": "PROVISIONAL",
+            "eligibility_status": "measured_but_ineligible",
+            "ineligibility_reason": "below_competence_floor",
+            "pareto_eligible": false,
+            "pareto_status": "measured_but_ineligible"
+          }
+        }
+      },
+      "tool_family_select": {
+        "pareto_optimal": [],
+        "dominated_by": {},
+        "excluded_unsafe": [],
+        "measured_but_ineligible": [
+          "openjev_06b",
+          "decider_2b",
+          "nanojev_06b",
+          "laya_421m"
+        ],
+        "capability_baselines": {
+          "capability": "tool_family_select",
+          "fixture_count": 2,
+          "trivial_baseline": 0.125,
+          "per_fixture_baselines": [
+            {
+              "fixture_id": "tool_family_select/read_search",
+              "option_count": 8,
+              "baseline": 0.125
+            },
+            {
+              "fixture_id": "tool_family_select/edit_after_locate",
+              "option_count": 8,
+              "baseline": 0.125
+            }
+          ],
+          "competence_margin": 0.05,
+          "competence_threshold": 0.175,
+          "validated_min_examples": 50
+        },
+        "strata": {
+          "openjev_06b": {
+            "denominator": 2,
+            "verified_accuracy": 0.0,
+            "mean_brier": 1.591941033965047,
+            "abstention_accuracy": null,
+            "dangerous_false_rate": 0.0,
+            "latency_ms_p50": 29.906059498898685,
+            "latency_ms_p95": 31.12876845189021,
+            "n": 2,
+            "trivial_baseline": 0.125,
+            "competence_margin": 0.05,
+            "competence_threshold": 0.175,
+            "evidence_state": "PROVISIONAL",
+            "eligibility_status": "measured_but_ineligible",
+            "ineligibility_reason": "below_competence_floor",
+            "pareto_eligible": false,
+            "pareto_status": "measured_but_ineligible"
+          },
+          "decider_2b": {
+            "denominator": 2,
+            "verified_accuracy": 1.0,
+            "mean_brier": 0.037953430306527,
+            "abstention_accuracy": null,
+            "dangerous_false_rate": 0.0,
+            "latency_ms_p50": 50.394249497912824,
+            "latency_ms_p95": 50.43795484962175,
+            "n": 2,
+            "trivial_baseline": 0.125,
+            "competence_margin": 0.05,
+            "competence_threshold": 0.175,
+            "evidence_state": "PROVISIONAL",
+            "eligibility_status": "measured_but_ineligible",
+            "ineligibility_reason": "provisional_evidence",
+            "pareto_eligible": false,
+            "pareto_status": "measured_but_ineligible"
+          },
+          "nanojev_06b": {
+            "denominator": 2,
+            "verified_accuracy": 0.0,
+            "mean_brier": 0.9790735376904749,
+            "abstention_accuracy": null,
+            "dangerous_false_rate": 0.0,
+            "latency_ms_p50": 36.20248450170038,
+            "latency_ms_p95": 36.547540449828375,
+            "n": 2,
+            "trivial_baseline": 0.125,
+            "competence_margin": 0.05,
+            "competence_threshold": 0.175,
+            "evidence_state": "PROVISIONAL",
+            "eligibility_status": "measured_but_ineligible",
+            "ineligibility_reason": "below_competence_floor",
+            "pareto_eligible": false,
+            "pareto_status": "measured_but_ineligible"
+          },
+          "laya_421m": {
+            "denominator": 2,
+            "verified_accuracy": 1.0,
+            "mean_brier": 0.25380534452935716,
+            "abstention_accuracy": null,
+            "dangerous_false_rate": 0.0,
+            "latency_ms_p50": 304.57272049898165,
+            "latency_ms_p95": 307.9803756536421,
+            "n": 2,
+            "trivial_baseline": 0.125,
+            "competence_margin": 0.05,
+            "competence_threshold": 0.175,
+            "evidence_state": "PROVISIONAL",
+            "eligibility_status": "measured_but_ineligible",
+            "ineligibility_reason": "provisional_evidence",
+            "pareto_eligible": false,
+            "pareto_status": "measured_but_ineligible"
+          }
+        },
+        "eligibility": {
+          "openjev_06b": {
+            "capability": "tool_family_select",
+            "n": 2,
+            "verified_accuracy": 0.0,
+            "trivial_baseline": 0.125,
+            "competence_margin": 0.05,
+            "competence_threshold": 0.175,
+            "dangerous_false_rate": 0.0,
+            "mean_brier": 1.591941033965047,
+            "latency_ms_p50": 29.906059498898685,
+            "latency_ms_p95": 31.12876845189021,
+            "evidence_state": "PROVISIONAL",
+            "eligibility_status": "measured_but_ineligible",
+            "ineligibility_reason": "below_competence_floor",
+            "pareto_eligible": false,
+            "pareto_status": "measured_but_ineligible"
+          },
+          "decider_2b": {
+            "capability": "tool_family_select",
+            "n": 2,
+            "verified_accuracy": 1.0,
+            "trivial_baseline": 0.125,
+            "competence_margin": 0.05,
+            "competence_threshold": 0.175,
+            "dangerous_false_rate": 0.0,
+            "mean_brier": 0.037953430306527,
+            "latency_ms_p50": 50.394249497912824,
+            "latency_ms_p95": 50.43795484962175,
+            "evidence_state": "PROVISIONAL",
+            "eligibility_status": "measured_but_ineligible",
+            "ineligibility_reason": "provisional_evidence",
+            "pareto_eligible": false,
+            "pareto_status": "measured_but_ineligible"
+          },
+          "nanojev_06b": {
+            "capability": "tool_family_select",
+            "n": 2,
+            "verified_accuracy": 0.0,
+            "trivial_baseline": 0.125,
+            "competence_margin": 0.05,
+            "competence_threshold": 0.175,
+            "dangerous_false_rate": 0.0,
+            "mean_brier": 0.9790735376904749,
+            "latency_ms_p50": 36.20248450170038,
+            "latency_ms_p95": 36.547540449828375,
+            "evidence_state": "PROVISIONAL",
+            "eligibility_status": "measured_but_ineligible",
+            "ineligibility_reason": "below_competence_floor",
+            "pareto_eligible": false,
+            "pareto_status": "measured_but_ineligible"
+          },
+          "laya_421m": {
+            "capability": "tool_family_select",
+            "n": 2,
+            "verified_accuracy": 1.0,
+            "trivial_baseline": 0.125,
+            "competence_margin": 0.05,
+            "competence_threshold": 0.175,
+            "dangerous_false_rate": 0.0,
+            "mean_brier": 0.25380534452935716,
+            "latency_ms_p50": 304.57272049898165,
+            "latency_ms_p95": 307.9803756536421,
+            "evidence_state": "PROVISIONAL",
+            "eligibility_status": "measured_but_ineligible",
+            "ineligibility_reason": "provisional_evidence",
+            "pareto_eligible": false,
+            "pareto_status": "measured_but_ineligible"
+          }
+        }
+      },
+      "retry_or_escalate": {
+        "pareto_optimal": [],
+        "dominated_by": {},
+        "excluded_unsafe": [
+          "openjev_06b",
+          "decider_2b",
+          "nanojev_06b",
+          "laya_421m"
+        ],
+        "measured_but_ineligible": [],
+        "capability_baselines": {
+          "capability": "retry_or_escalate",
+          "fixture_count": 2,
+          "trivial_baseline": 0.25,
+          "per_fixture_baselines": [
+            {
+              "fixture_id": "retry_or_escalate/transient_retry",
+              "option_count": 4,
+              "baseline": 0.25
+            },
+            {
+              "fixture_id": "retry_or_escalate/hard_escalate",
+              "option_count": 4,
+              "baseline": 0.25
+            }
+          ],
+          "competence_margin": 0.05,
+          "competence_threshold": 0.5,
+          "validated_min_examples": 50
+        },
+        "strata": {
+          "openjev_06b": {
+            "denominator": 2,
+            "verified_accuracy": 0.5,
+            "mean_brier": 0.9998524115008696,
+            "abstention_accuracy": null,
+            "dangerous_false_rate": 0.5,
+            "latency_ms_p50": 29.70771949912887,
+            "latency_ms_p95": 30.073262154473923,
+            "n": 2,
+            "trivial_baseline": 0.25,
+            "competence_margin": 0.05,
+            "competence_threshold": 0.5,
+            "evidence_state": "PROVISIONAL",
+            "eligibility_status": "excluded_unsafe",
+            "ineligibility_reason": "dangerous_false",
+            "pareto_eligible": false,
+            "pareto_status": "excluded_unsafe"
+          },
+          "decider_2b": {
+            "denominator": 2,
+            "verified_accuracy": 0.5,
+            "mean_brier": 0.5604133817195223,
+            "abstention_accuracy": null,
+            "dangerous_false_rate": 0.5,
+            "latency_ms_p50": 49.24413999833632,
+            "latency_ms_p95": 50.291863298480166,
+            "n": 2,
+            "trivial_baseline": 0.25,
+            "competence_margin": 0.05,
+            "competence_threshold": 0.5,
+            "evidence_state": "PROVISIONAL",
+            "eligibility_status": "excluded_unsafe",
+            "ineligibility_reason": "dangerous_false",
+            "pareto_eligible": false,
+            "pareto_status": "excluded_unsafe"
+          },
+          "nanojev_06b": {
+            "denominator": 2,
+            "verified_accuracy": 0.5,
+            "mean_brier": 0.5467185305402534,
+            "abstention_accuracy": null,
+            "dangerous_false_rate": 0.5,
+            "latency_ms_p50": 35.11195250030141,
+            "latency_ms_p95": 36.361534548632335,
+            "n": 2,
+            "trivial_baseline": 0.25,
+            "competence_margin": 0.05,
+            "competence_threshold": 0.5,
+            "evidence_state": "PROVISIONAL",
+            "eligibility_status": "excluded_unsafe",
+            "ineligibility_reason": "dangerous_false",
+            "pareto_eligible": false,
+            "pareto_status": "excluded_unsafe"
+          },
+          "laya_421m": {
+            "denominator": 2,
+            "verified_accuracy": 0.5,
+            "mean_brier": 0.8889354943698461,
+            "abstention_accuracy": null,
+            "dangerous_false_rate": 0.5,
+            "latency_ms_p50": 262.5832329977129,
+            "latency_ms_p95": 262.6355517993943,
+            "n": 2,
+            "trivial_baseline": 0.25,
+            "competence_margin": 0.05,
+            "competence_threshold": 0.5,
+            "evidence_state": "PROVISIONAL",
+            "eligibility_status": "excluded_unsafe",
+            "ineligibility_reason": "dangerous_false",
+            "pareto_eligible": false,
+            "pareto_status": "excluded_unsafe"
+          }
+        },
+        "eligibility": {
+          "openjev_06b": {
+            "capability": "retry_or_escalate",
+            "n": 2,
+            "verified_accuracy": 0.5,
+            "trivial_baseline": 0.25,
+            "competence_margin": 0.05,
+            "competence_threshold": 0.5,
+            "dangerous_false_rate": 0.5,
+            "mean_brier": 0.9998524115008696,
+            "latency_ms_p50": 29.70771949912887,
+            "latency_ms_p95": 30.073262154473923,
+            "evidence_state": "PROVISIONAL",
+            "eligibility_status": "excluded_unsafe",
+            "ineligibility_reason": "dangerous_false",
+            "pareto_eligible": false,
+            "pareto_status": "excluded_unsafe"
+          },
+          "decider_2b": {
+            "capability": "retry_or_escalate",
+            "n": 2,
+            "verified_accuracy": 0.5,
+            "trivial_baseline": 0.25,
+            "competence_margin": 0.05,
+            "competence_threshold": 0.5,
+            "dangerous_false_rate": 0.5,
+            "mean_brier": 0.5604133817195223,
+            "latency_ms_p50": 49.24413999833632,
+            "latency_ms_p95": 50.291863298480166,
+            "evidence_state": "PROVISIONAL",
+            "eligibility_status": "excluded_unsafe",
+            "ineligibility_reason": "dangerous_false",
+            "pareto_eligible": false,
+            "pareto_status": "excluded_unsafe"
+          },
+          "nanojev_06b": {
+            "capability": "retry_or_escalate",
+            "n": 2,
+            "verified_accuracy": 0.5,
+            "trivial_baseline": 0.25,
+            "competence_margin": 0.05,
+            "competence_threshold": 0.5,
+            "dangerous_false_rate": 0.5,
+            "mean_brier": 0.5467185305402534,
+            "latency_ms_p50": 35.11195250030141,
+            "latency_ms_p95": 36.361534548632335,
+            "evidence_state": "PROVISIONAL",
+            "eligibility_status": "excluded_unsafe",
+            "ineligibility_reason": "dangerous_false",
+            "pareto_eligible": false,
+            "pareto_status": "excluded_unsafe"
+          },
+          "laya_421m": {
+            "capability": "retry_or_escalate",
+            "n": 2,
+            "verified_accuracy": 0.5,
+            "trivial_baseline": 0.25,
+            "competence_margin": 0.05,
+            "competence_threshold": 0.5,
+            "dangerous_false_rate": 0.5,
+            "mean_brier": 0.8889354943698461,
+            "latency_ms_p50": 262.5832329977129,
+            "latency_ms_p95": 262.6355517993943,
+            "evidence_state": "PROVISIONAL",
+            "eligibility_status": "excluded_unsafe",
+            "ineligibility_reason": "dangerous_false",
+            "pareto_eligible": false,
+            "pareto_status": "excluded_unsafe"
+          }
+        }
+      },
+      "context_compress_needed": {
+        "pareto_optimal": [],
+        "dominated_by": {},
+        "excluded_unsafe": [],
+        "measured_but_ineligible": [
+          "openjev_06b",
+          "decider_2b",
+          "nanojev_06b",
+          "laya_421m"
+        ],
+        "capability_baselines": {
+          "capability": "context_compress_needed",
+          "fixture_count": 2,
+          "trivial_baseline": 0.3333333333333333,
+          "per_fixture_baselines": [
+            {
+              "fixture_id": "context_compress_needed/yes_large_context",
+              "option_count": 3,
+              "baseline": 0.3333333333333333
+            },
+            {
+              "fixture_id": "context_compress_needed/no_headroom_ok",
+              "option_count": 3,
+              "baseline": 0.3333333333333333
+            }
+          ],
+          "competence_margin": 0.05,
+          "competence_threshold": 0.3833333333333333,
+          "validated_min_examples": 50
+        },
+        "strata": {
+          "openjev_06b": {
+            "denominator": 2,
+            "verified_accuracy": 0.5,
+            "mean_brier": 0.9999989381480583,
+            "abstention_accuracy": null,
+            "dangerous_false_rate": 0.0,
+            "latency_ms_p50": 29.107972997735487,
+            "latency_ms_p95": 29.767332794654067,
+            "n": 2,
+            "trivial_baseline": 0.3333333333333333,
+            "competence_margin": 0.05,
+            "competence_threshold": 0.3833333333333333,
+            "evidence_state": "PROVISIONAL",
+            "eligibility_status": "measured_but_ineligible",
+            "ineligibility_reason": "provisional_evidence",
+            "pareto_eligible": false,
+            "pareto_status": "measured_but_ineligible"
+          },
+          "decider_2b": {
+            "denominator": 2,
+            "verified_accuracy": 0.5,
+            "mean_brier": 0.6150460799999999,
+            "abstention_accuracy": null,
+            "dangerous_false_rate": 0.0,
+            "latency_ms_p50": 49.89746700084652,
+            "latency_ms_p95": 52.18186410384078,
+            "n": 2,
+            "trivial_baseline": 0.3333333333333333,
+            "competence_margin": 0.05,
+            "competence_threshold": 0.3833333333333333,
+            "evidence_state": "PROVISIONAL",
+            "eligibility_status": "measured_but_ineligible",
+            "ineligibility_reason": "provisional_evidence",
+            "pareto_eligible": false,
+            "pareto_status": "measured_but_ineligible"
+          },
+          "nanojev_06b": {
+            "denominator": 2,
+            "verified_accuracy": 0.5,
+            "mean_brier": 0.7716871151178983,
+            "abstention_accuracy": null,
+            "dangerous_false_rate": 0.0,
+            "latency_ms_p50": 36.61760150134796,
+            "latency_ms_p95": 37.9580529537634,
+            "n": 2,
+            "trivial_baseline": 0.3333333333333333,
+            "competence_margin": 0.05,
+            "competence_threshold": 0.3833333333333333,
+            "evidence_state": "PROVISIONAL",
+            "eligibility_status": "measured_but_ineligible",
+            "ineligibility_reason": "provisional_evidence",
+            "pareto_eligible": false,
+            "pareto_status": "measured_but_ineligible"
+          },
+          "laya_421m": {
+            "denominator": 2,
+            "verified_accuracy": 0.0,
+            "mean_brier": 0.7103615134978617,
+            "abstention_accuracy": null,
+            "dangerous_false_rate": 0.0,
+            "latency_ms_p50": 243.9155665015278,
+            "latency_ms_p95": 248.0245313494379,
+            "n": 2,
+            "trivial_baseline": 0.3333333333333333,
+            "competence_margin": 0.05,
+            "competence_threshold": 0.3833333333333333,
+            "evidence_state": "PROVISIONAL",
+            "eligibility_status": "measured_but_ineligible",
+            "ineligibility_reason": "below_competence_floor",
+            "pareto_eligible": false,
+            "pareto_status": "measured_but_ineligible"
+          }
+        },
+        "eligibility": {
+          "openjev_06b": {
+            "capability": "context_compress_needed",
+            "n": 2,
+            "verified_accuracy": 0.5,
+            "trivial_baseline": 0.3333333333333333,
+            "competence_margin": 0.05,
+            "competence_threshold": 0.3833333333333333,
+            "dangerous_false_rate": 0.0,
+            "mean_brier": 0.9999989381480583,
+            "latency_ms_p50": 29.107972997735487,
+            "latency_ms_p95": 29.767332794654067,
+            "evidence_state": "PROVISIONAL",
+            "eligibility_status": "measured_but_ineligible",
+            "ineligibility_reason": "provisional_evidence",
+            "pareto_eligible": false,
+            "pareto_status": "measured_but_ineligible"
+          },
+          "decider_2b": {
+            "capability": "context_compress_needed",
+            "n": 2,
+            "verified_accuracy": 0.5,
+            "trivial_baseline": 0.3333333333333333,
+            "competence_margin": 0.05,
+            "competence_threshold": 0.3833333333333333,
+            "dangerous_false_rate": 0.0,
+            "mean_brier": 0.6150460799999999,
+            "latency_ms_p50": 49.89746700084652,
+            "latency_ms_p95": 52.18186410384078,
+            "evidence_state": "PROVISIONAL",
+            "eligibility_status": "measured_but_ineligible",
+            "ineligibility_reason": "provisional_evidence",
+            "pareto_eligible": false,
+            "pareto_status": "measured_but_ineligible"
+          },
+          "nanojev_06b": {
+            "capability": "context_compress_needed",
+            "n": 2,
+            "verified_accuracy": 0.5,
+            "trivial_baseline": 0.3333333333333333,
+            "competence_margin": 0.05,
+            "competence_threshold": 0.3833333333333333,
+            "dangerous_false_rate": 0.0,
+            "mean_brier": 0.7716871151178983,
+            "latency_ms_p50": 36.61760150134796,
+            "latency_ms_p95": 37.9580529537634,
+            "evidence_state": "PROVISIONAL",
+            "eligibility_status": "measured_but_ineligible",
+            "ineligibility_reason": "provisional_evidence",
+            "pareto_eligible": false,
+            "pareto_status": "measured_but_ineligible"
+          },
+          "laya_421m": {
+            "capability": "context_compress_needed",
+            "n": 2,
+            "verified_accuracy": 0.0,
+            "trivial_baseline": 0.3333333333333333,
+            "competence_margin": 0.05,
+            "competence_threshold": 0.3833333333333333,
+            "dangerous_false_rate": 0.0,
+            "mean_brier": 0.7103615134978617,
+            "latency_ms_p50": 243.9155665015278,
+            "latency_ms_p95": 248.0245313494379,
+            "evidence_state": "PROVISIONAL",
+            "eligibility_status": "measured_but_ineligible",
+            "ineligibility_reason": "below_competence_floor",
+            "pareto_eligible": false,
+            "pareto_status": "measured_but_ineligible"
+          }
+        }
+      },
+      "verification_needed": {
+        "pareto_optimal": [],
+        "dominated_by": {},
+        "excluded_unsafe": [],
+        "measured_but_ineligible": [
+          "openjev_06b",
+          "decider_2b",
+          "nanojev_06b",
+          "laya_421m"
+        ],
+        "capability_baselines": {
+          "capability": "verification_needed",
+          "fixture_count": 2,
+          "trivial_baseline": 0.5,
+          "per_fixture_baselines": [
+            {
+              "fixture_id": "verification_needed/after_edit",
+              "option_count": 2,
+              "baseline": 0.5
+            },
+            {
+              "fixture_id": "verification_needed/informational_only",
+              "option_count": 2,
+              "baseline": 0.5
+            }
+          ],
+          "competence_margin": 0.05,
+          "competence_threshold": 0.55,
+          "validated_min_examples": 50
+        },
+        "strata": {
+          "openjev_06b": {
+            "denominator": 2,
+            "verified_accuracy": 0.5,
+            "mean_brier": 0.9806773107883173,
+            "abstention_accuracy": null,
+            "dangerous_false_rate": 0.0,
+            "latency_ms_p50": 32.90241650029202,
+            "latency_ms_p95": 37.45575275133888,
+            "n": 2,
+            "trivial_baseline": 0.5,
+            "competence_margin": 0.05,
+            "competence_threshold": 0.55,
+            "evidence_state": "PROVISIONAL",
+            "eligibility_status": "measured_but_ineligible",
+            "ineligibility_reason": "below_competence_floor",
+            "pareto_eligible": false,
+            "pareto_status": "measured_but_ineligible"
+          },
+          "decider_2b": {
+            "denominator": 2,
+            "verified_accuracy": 0.5,
+            "mean_brier": 0.4736457700000001,
+            "abstention_accuracy": null,
+            "dangerous_false_rate": 0.0,
+            "latency_ms_p50": 54.6965560024546,
+            "latency_ms_p95": 55.54612719897705,
+            "n": 2,
+            "trivial_baseline": 0.5,
+            "competence_margin": 0.05,
+            "competence_threshold": 0.55,
+            "evidence_state": "PROVISIONAL",
+            "eligibility_status": "measured_but_ineligible",
+            "ineligibility_reason": "below_competence_floor",
+            "pareto_eligible": false,
+            "pareto_status": "measured_but_ineligible"
+          },
+          "nanojev_06b": {
+            "denominator": 2,
+            "verified_accuracy": 0.5,
+            "mean_brier": 0.6038949747068934,
+            "abstention_accuracy": null,
+            "dangerous_false_rate": 0.0,
+            "latency_ms_p50": 32.092242494400125,
+            "latency_ms_p95": 32.50437274327851,
+            "n": 2,
+            "trivial_baseline": 0.5,
+            "competence_margin": 0.05,
+            "competence_threshold": 0.55,
+            "evidence_state": "PROVISIONAL",
+            "eligibility_status": "measured_but_ineligible",
+            "ineligibility_reason": "below_competence_floor",
+            "pareto_eligible": false,
+            "pareto_status": "measured_but_ineligible"
+          },
+          "laya_421m": {
+            "denominator": 2,
+            "verified_accuracy": 1.0,
+            "mean_brier": 0.3653653,
+            "abstention_accuracy": null,
+            "dangerous_false_rate": 0.0,
+            "latency_ms_p50": 228.62499750044663,
+            "latency_ms_p95": 230.72387084539514,
+            "n": 2,
+            "trivial_baseline": 0.5,
+            "competence_margin": 0.05,
+            "competence_threshold": 0.55,
+            "evidence_state": "PROVISIONAL",
+            "eligibility_status": "measured_but_ineligible",
+            "ineligibility_reason": "provisional_evidence",
+            "pareto_eligible": false,
+            "pareto_status": "measured_but_ineligible"
+          }
+        },
+        "eligibility": {
+          "openjev_06b": {
+            "capability": "verification_needed",
+            "n": 2,
+            "verified_accuracy": 0.5,
+            "trivial_baseline": 0.5,
+            "competence_margin": 0.05,
+            "competence_threshold": 0.55,
+            "dangerous_false_rate": 0.0,
+            "mean_brier": 0.9806773107883173,
+            "latency_ms_p50": 32.90241650029202,
+            "latency_ms_p95": 37.45575275133888,
+            "evidence_state": "PROVISIONAL",
+            "eligibility_status": "measured_but_ineligible",
+            "ineligibility_reason": "below_competence_floor",
+            "pareto_eligible": false,
+            "pareto_status": "measured_but_ineligible"
+          },
+          "decider_2b": {
+            "capability": "verification_needed",
+            "n": 2,
+            "verified_accuracy": 0.5,
+            "trivial_baseline": 0.5,
+            "competence_margin": 0.05,
+            "competence_threshold": 0.55,
+            "dangerous_false_rate": 0.0,
+            "mean_brier": 0.4736457700000001,
+            "latency_ms_p50": 54.6965560024546,
+            "latency_ms_p95": 55.54612719897705,
+            "evidence_state": "PROVISIONAL",
+            "eligibility_status": "measured_but_ineligible",
+            "ineligibility_reason": "below_competence_floor",
+            "pareto_eligible": false,
+            "pareto_status": "measured_but_ineligible"
+          },
+          "nanojev_06b": {
+            "capability": "verification_needed",
+            "n": 2,
+            "verified_accuracy": 0.5,
+            "trivial_baseline": 0.5,
+            "competence_margin": 0.05,
+            "competence_threshold": 0.55,
+            "dangerous_false_rate": 0.0,
+            "mean_brier": 0.6038949747068934,
+            "latency_ms_p50": 32.092242494400125,
+            "latency_ms_p95": 32.50437274327851,
+            "evidence_state": "PROVISIONAL",
+            "eligibility_status": "measured_but_ineligible",
+            "ineligibility_reason": "below_competence_floor",
+            "pareto_eligible": false,
+            "pareto_status": "measured_but_ineligible"
+          },
+          "laya_421m": {
+            "capability": "verification_needed",
+            "n": 2,
+            "verified_accuracy": 1.0,
+            "trivial_baseline": 0.5,
+            "competence_margin": 0.05,
+            "competence_threshold": 0.55,
+            "dangerous_false_rate": 0.0,
+            "mean_brier": 0.3653653,
+            "latency_ms_p50": 228.62499750044663,
+            "latency_ms_p95": 230.72387084539514,
+            "evidence_state": "PROVISIONAL",
+            "eligibility_status": "measured_but_ineligible",
+            "ineligibility_reason": "provisional_evidence",
+            "pareto_eligible": false,
+            "pareto_status": "measured_but_ineligible"
+          }
+        }
+      }
+    }
+  },
+  "aggregate": {
+    "examples_total": 44,
+    "examples_ok": 44,
+    "examples_unavailable": 0,
+    "examples_error": 0,
+    "by_capability": {
+      "context_compress_needed": {
+        "denominator": 8,
+        "verified_accuracy": 0.375,
+        "mean_brier": 0.7742734116909545,
+        "abstention_accuracy": null,
+        "dangerous_false_rate": 0.0,
+        "latency_ms_p50": 42.73312000077567,
+        "latency_ms_p95": 245.28522145083116
+      },
+      "retry_or_escalate": {
+        "denominator": 8,
+        "verified_accuracy": 0.5,
+        "mean_brier": 0.7489799545326228,
+        "abstention_accuracy": null,
+        "dangerous_false_rate": 0.5,
+        "latency_ms_p50": 42.29018999831169,
+        "latency_ms_p95": 262.6006725982734
+      },
+      "rlm.worker_needed": {
+        "denominator": 12,
+        "verified_accuracy": 0.5,
+        "mean_brier": 0.6751350323485976,
+        "abstention_accuracy": 0.25,
+        "dangerous_false_rate": 0.16666666666666666,
+        "latency_ms_p50": 70.79762499779463,
+        "latency_ms_p95": 733.3421251485554
+      },
+      "tool_family_select": {
+        "denominator": 8,
+        "verified_accuracy": 0.5,
+        "mean_brier": 0.7156933366228515,
+        "abstention_accuracy": null,
+        "dangerous_false_rate": 0.0,
+        "latency_ms_p50": 43.4657839978172,
+        "latency_ms_p95": 305.70860555053514
+      },
+      "verification_needed": {
+        "denominator": 8,
+        "verified_accuracy": 0.625,
+        "mean_brier": 0.6058958388738027,
+        "abstention_accuracy": null,
+        "dangerous_false_rate": 0.0,
+        "latency_ms_p50": 45.85713350388687,
+        "latency_ms_p95": 229.3246219487628
+      }
+    },
+    "latency_ms_p50": 48.29725949821295,
+    "latency_ms_p95": 307.22311895260646,
+    "startup_ms_p50": 8361.921621002693,
+    "throughput_rps": 7.685127624048979,
+    "vram_mb_peak": 5011.0,
+    "ram_mb_peak": 6451.109375
+  },
+  "analytics": {
+    "schema": "z0int.backends_bench.analytics.v1",
+    "quality": {
+      "by_capability": {
+        "context_compress_needed": {
+          "n": 8,
+          "correct": 3,
+          "accuracy": 0.375,
+          "dangerous_false_count": 0,
+          "dangerous_false_rate": 0.0,
+          "mean_brier": 0.7742734116909545,
+          "latency_ms_p50": 42.73312000077567,
+          "latency_ms_p95": 245.28522145083116,
+          "startup_ms_p50": null
+        },
+        "retry_or_escalate": {
+          "n": 8,
+          "correct": 4,
+          "accuracy": 0.5,
+          "dangerous_false_count": 4,
+          "dangerous_false_rate": 0.5,
+          "mean_brier": 0.7489799545326228,
+          "latency_ms_p50": 42.29018999831169,
+          "latency_ms_p95": 262.6006725982734,
+          "startup_ms_p50": null
+        },
+        "rlm.worker_needed": {
+          "n": 12,
+          "correct": 6,
+          "accuracy": 0.5,
+          "dangerous_false_count": 2,
+          "dangerous_false_rate": 0.16666666666666666,
+          "mean_brier": 0.6751350323485976,
+          "latency_ms_p50": 70.79762499779463,
+          "latency_ms_p95": 733.3421251485554,
+          "startup_ms_p50": 8361.921621002693
+        },
+        "tool_family_select": {
+          "n": 8,
+          "correct": 4,
+          "accuracy": 0.5,
+          "dangerous_false_count": 0,
+          "dangerous_false_rate": 0.0,
+          "mean_brier": 0.7156933366228515,
+          "latency_ms_p50": 43.4657839978172,
+          "latency_ms_p95": 305.70860555053514,
+          "startup_ms_p50": null
+        },
+        "verification_needed": {
+          "n": 8,
+          "correct": 5,
+          "accuracy": 0.625,
+          "dangerous_false_count": 0,
+          "dangerous_false_rate": 0.0,
+          "mean_brier": 0.6058958388738027,
+          "latency_ms_p50": 45.85713350388687,
+          "latency_ms_p95": 229.3246219487628,
+          "startup_ms_p50": null
+        }
+      }
+    },
+    "safety": {
+      "by_capability": {
+        "context_compress_needed": {
+          "dangerous_false_count": 0,
+          "dangerous_false_rate": 0.0
+        },
+        "retry_or_escalate": {
+          "dangerous_false_count": 4,
+          "dangerous_false_rate": 0.5
+        },
+        "rlm.worker_needed": {
+          "dangerous_false_count": 2,
+          "dangerous_false_rate": 0.16666666666666666
+        },
+        "tool_family_select": {
+          "dangerous_false_count": 0,
+          "dangerous_false_rate": 0.0
+        },
+        "verification_needed": {
+          "dangerous_false_count": 0,
+          "dangerous_false_rate": 0.0
+        }
+      }
+    },
+    "latency": {
+      "decider_2b": {
+        "overall": {
+          "n": 11,
+          "correct": 7,
+          "accuracy": 0.6363636363636364,
+          "dangerous_false_count": 1,
+          "dangerous_false_rate": 0.09090909090909091,
+          "mean_brier": 0.4409053930956453,
+          "latency_ms_p50": 50.44281099981163,
+          "latency_ms_p95": 629.2987729975721,
+          "startup_ms_p50": 9854.713323002215
+        },
+        "by_capability": {
+          "context_compress_needed": {
+            "n": 2,
+            "correct": 1,
+            "accuracy": 0.5,
+            "dangerous_false_count": 0,
+            "dangerous_false_rate": 0.0,
+            "mean_brier": 0.6150460799999999,
+            "latency_ms_p50": 49.89746700084652,
+            "latency_ms_p95": 52.18186410384078,
+            "startup_ms_p50": null
+          },
+          "retry_or_escalate": {
+            "n": 2,
+            "correct": 1,
+            "accuracy": 0.5,
+            "dangerous_false_count": 1,
+            "dangerous_false_rate": 0.5,
+            "mean_brier": 0.5604133817195223,
+            "latency_ms_p50": 49.24413999833632,
+            "latency_ms_p95": 50.291863298480166,
+            "startup_ms_p50": null
+          },
+          "rlm.worker_needed": {
+            "n": 3,
+            "correct": 2,
+            "accuracy": 0.6666666666666666,
+            "dangerous_false_count": 0,
+            "dangerous_false_rate": 0.0,
+            "mean_brier": 0.49194733333333335,
+            "latency_ms_p50": 50.87744499905966,
+            "latency_ms_p95": 1087.7490642968041,
+            "startup_ms_p50": 9854.713323002215
+          },
+          "tool_family_select": {
+            "n": 2,
+            "correct": 2,
+            "accuracy": 1.0,
+            "dangerous_false_count": 0,
+            "dangerous_false_rate": 0.0,
+            "mean_brier": 0.037953430306527,
+            "latency_ms_p50": 50.394249497912824,
+            "latency_ms_p95": 50.43795484962175,
+            "startup_ms_p50": null
+          },
+          "verification_needed": {
+            "n": 2,
+            "correct": 1,
+            "accuracy": 0.5,
+            "dangerous_false_count": 0,
+            "dangerous_false_rate": 0.0,
+            "mean_brier": 0.4736457700000001,
+            "latency_ms_p50": 54.6965560024546,
+            "latency_ms_p95": 55.54612719897705,
+            "startup_ms_p50": null
+          }
+        }
+      },
+      "laya_421m": {
+        "overall": {
+          "n": 11,
+          "correct": 6,
+          "accuracy": 0.5454545454545454,
+          "dangerous_false_count": 1,
+          "dangerous_false_rate": 0.09090909090909091,
+          "mean_brier": 0.5766445209290488,
+          "latency_ms_p50": 262.5251009958447,
+          "latency_ms_p95": 328.73537950217724,
+          "startup_ms_p50": 6869.129919003171
+        },
+        "by_capability": {
+          "context_compress_needed": {
+            "n": 2,
+            "correct": 0,
+            "accuracy": 0.0,
+            "dangerous_false_count": 0,
+            "dangerous_false_rate": 0.0,
+            "mean_brier": 0.7103615134978617,
+            "latency_ms_p50": 243.9155665015278,
+            "latency_ms_p95": 248.0245313494379,
+            "startup_ms_p50": null
+          },
+          "retry_or_escalate": {
+            "n": 2,
+            "correct": 1,
+            "accuracy": 0.5,
+            "dangerous_false_count": 1,
+            "dangerous_false_rate": 0.5,
+            "mean_brier": 0.8889354943698461,
+            "latency_ms_p50": 262.5832329977129,
+            "latency_ms_p95": 262.6355517993943,
+            "startup_ms_p50": null
+          },
+          "rlm.worker_needed": {
+            "n": 3,
+            "correct": 1,
+            "accuracy": 0.3333333333333333,
+            "dangerous_false_count": 0,
+            "dangerous_false_rate": 0.0,
+            "mean_brier": 0.6353848084751358,
+            "latency_ms_p50": 296.89219599822536,
+            "latency_ms_p95": 343.88979909999756,
+            "startup_ms_p50": 6869.129919003171
+          },
+          "tool_family_select": {
+            "n": 2,
+            "correct": 2,
+            "accuracy": 1.0,
+            "dangerous_false_count": 0,
+            "dangerous_false_rate": 0.0,
+            "mean_brier": 0.25380534452935716,
+            "latency_ms_p50": 304.57272049898165,
+            "latency_ms_p95": 307.9803756536421,
+            "startup_ms_p50": null
+          },
+          "verification_needed": {
+            "n": 2,
+            "correct": 2,
+            "accuracy": 1.0,
+            "dangerous_false_count": 0,
+            "dangerous_false_rate": 0.0,
+            "mean_brier": 0.3653653,
+            "latency_ms_p50": 228.62499750044663,
+            "latency_ms_p95": 230.72387084539514,
+            "startup_ms_p50": null
+          }
+        }
+      },
+      "nanojev_06b": {
+        "overall": {
+          "n": 11,
+          "correct": 4,
+          "accuracy": 0.36363636363636365,
+          "dangerous_false_count": 2,
+          "dangerous_false_rate": 0.18181818181818182,
+          "mean_brier": 0.7715187361891119,
+          "latency_ms_p50": 35.128210998664144,
+          "latency_ms_p95": 64.41239850028069,
+          "startup_ms_p50": 14076.39072999882
+        },
+        "by_capability": {
+          "context_compress_needed": {
+            "n": 2,
+            "correct": 1,
+            "accuracy": 0.5,
+            "dangerous_false_count": 0,
+            "dangerous_false_rate": 0.0,
+            "mean_brier": 0.7716871151178983,
+            "latency_ms_p50": 36.61760150134796,
+            "latency_ms_p95": 37.9580529537634,
+            "startup_ms_p50": null
+          },
+          "retry_or_escalate": {
+            "n": 2,
+            "correct": 1,
+            "accuracy": 0.5,
+            "dangerous_false_count": 1,
+            "dangerous_false_rate": 0.5,
+            "mean_brier": 0.5467185305402534,
+            "latency_ms_p50": 35.11195250030141,
+            "latency_ms_p95": 36.361534548632335,
+            "startup_ms_p50": null
+          },
+          "rlm.worker_needed": {
+            "n": 3,
+            "correct": 1,
+            "accuracy": 0.3333333333333333,
+            "dangerous_false_count": 1,
+            "dangerous_false_rate": 0.3333333333333333,
+            "mean_brier": 0.8946525939897303,
+            "latency_ms_p50": 35.063941999396775,
+            "latency_ms_p95": 85.1524186968163,
+            "startup_ms_p50": 14076.39072999882
+          },
+          "tool_family_select": {
+            "n": 2,
+            "correct": 0,
+            "accuracy": 0.0,
+            "dangerous_false_count": 0,
+            "dangerous_false_rate": 0.0,
+            "mean_brier": 0.9790735376904749,
+            "latency_ms_p50": 36.20248450170038,
+            "latency_ms_p95": 36.547540449828375,
+            "startup_ms_p50": null
+          },
+          "verification_needed": {
+            "n": 2,
+            "correct": 1,
+            "accuracy": 0.5,
+            "dangerous_false_count": 0,
+            "dangerous_false_rate": 0.0,
+            "mean_brier": 0.6038949747068934,
+            "latency_ms_p50": 32.092242494400125,
+            "latency_ms_p95": 32.50437274327851,
+            "startup_ms_p50": null
+          }
+        }
+      },
+      "openjev_06b": {
+        "overall": {
+          "n": 11,
+          "correct": 5,
+          "accuracy": 0.45454545454545453,
+          "dangerous_false_count": 2,
+          "dangerous_false_rate": 0.18181818181818182,
+          "mean_brier": 1.0164186881448325,
+          "latency_ms_p50": 29.301560993189923,
+          "latency_ms_p95": 168.95907450088998,
+          "startup_ms_p50": 6643.251567998959
+        },
+        "by_capability": {
+          "context_compress_needed": {
+            "n": 2,
+            "correct": 1,
+            "accuracy": 0.5,
+            "dangerous_false_count": 0,
+            "dangerous_false_rate": 0.0,
+            "mean_brier": 0.9999989381480583,
+            "latency_ms_p50": 29.107972997735487,
+            "latency_ms_p95": 29.767332794654067,
+            "startup_ms_p50": null
+          },
+          "retry_or_escalate": {
+            "n": 2,
+            "correct": 1,
+            "accuracy": 0.5,
+            "dangerous_false_count": 1,
+            "dangerous_false_rate": 0.5,
+            "mean_brier": 0.9998524115008696,
+            "latency_ms_p50": 29.70771949912887,
+            "latency_ms_p95": 30.073262154473923,
+            "startup_ms_p50": null
+          },
+          "rlm.worker_needed": {
+            "n": 3,
+            "correct": 2,
+            "accuracy": 0.6666666666666666,
+            "dangerous_false_count": 1,
+            "dangerous_false_rate": 0.3333333333333333,
+            "mean_brier": 0.6785553935961912,
+            "latency_ms_p50": 28.55783500126563,
+            "latency_ms_p95": 272.81660650041886,
+            "startup_ms_p50": 6643.251567998959
+          },
+          "tool_family_select": {
+            "n": 2,
+            "correct": 0,
+            "accuracy": 0.0,
+            "dangerous_false_count": 0,
+            "dangerous_false_rate": 0.0,
+            "mean_brier": 1.591941033965047,
+            "latency_ms_p50": 29.906059498898685,
+            "latency_ms_p95": 31.12876845189021,
+            "startup_ms_p50": null
+          },
+          "verification_needed": {
+            "n": 2,
+            "correct": 1,
+            "accuracy": 0.5,
+            "dangerous_false_count": 0,
+            "dangerous_false_rate": 0.0,
+            "mean_brier": 0.9806773107883173,
+            "latency_ms_p50": 32.90241650029202,
+            "latency_ms_p95": 37.45575275133888,
+            "startup_ms_p50": null
+          }
+        }
+      }
+    },
+    "reliability": {
+      "rows_total": 44,
+      "rows_ok": 44,
+      "rows_unavailable": 0,
+      "rows_error": 0
+    }
+  },
+  "paired_comparisons": {
+    "schema": "z0int.backends_bench.paired.v1",
+    "comparisons": [
+      {
+        "a": "decider_2b",
+        "b": "laya_421m",
+        "paired_fixtures": 11,
+        "both_correct": 5,
+        "a_only_correct": 2,
+        "b_only_correct": 1,
+        "both_wrong": 3,
+        "median_latency_ratio_a_over_b": 0.19503684312466182
+      },
+      {
+        "a": "decider_2b",
+        "b": "nanojev_06b",
+        "paired_fixtures": 11,
+        "both_correct": 4,
+        "a_only_correct": 3,
+        "b_only_correct": 0,
+        "both_wrong": 4,
+        "median_latency_ratio_a_over_b": 1.405554674790877
+      },
+      {
+        "a": "decider_2b",
+        "b": "openjev_06b",
+        "paired_fixtures": 11,
+        "both_correct": 4,
+        "a_only_correct": 3,
+        "b_only_correct": 1,
+        "both_wrong": 3,
+        "median_latency_ratio_a_over_b": 1.698816314195363
+      },
+      {
+        "a": "laya_421m",
+        "b": "nanojev_06b",
+        "paired_fixtures": 11,
+        "both_correct": 2,
+        "a_only_correct": 4,
+        "b_only_correct": 2,
+        "both_wrong": 3,
+        "median_latency_ratio_a_over_b": 7.195579514446021
+      },
+      {
+        "a": "laya_421m",
+        "b": "openjev_06b",
+        "paired_fixtures": 11,
+        "both_correct": 2,
+        "a_only_correct": 4,
+        "b_only_correct": 3,
+        "both_wrong": 2,
+        "median_latency_ratio_a_over_b": 8.710232830776128
+      },
+      {
+        "a": "nanojev_06b",
+        "b": "openjev_06b",
+        "paired_fixtures": 11,
+        "both_correct": 4,
+        "a_only_correct": 0,
+        "b_only_correct": 1,
+        "both_wrong": 6,
+        "median_latency_ratio_a_over_b": 1.2120782647888888
+      }
+    ]
+  },
+  "coverage": {
+    "schema": "tokenomics.coverage.v1",
+    "range": "7d",
+    "period": {
+      "start_ts": 1789180414.4727688,
+      "end_ts": 1789785214.4727688,
+      "start_iso": "2026-09-12T02:33:34.472769+00:00",
+      "end_iso": "2026-09-19T02:33:34.472769+00:00"
+    },
+    "sources": [],
+    "n_events": 132,
+    "n_traces": 44,
+    "traces": [
+      {
+        "trace_id": "0011d76b6ebd4f849a5ff4b05baa283c",
+        "measurement_level": "M2",
+        "actual_usage": "incremental",
+        "baseline": "missing",
+        "outcome": "negative",
+        "attribution": [
+          "context",
+          "omp",
+          "routing"
+        ],
+        "harness": "z0int",
+        "actual_frontier_tokens": 144,
+        "baseline_frontier_tokens": null,
+        "tokens_avoided": 0,
+        "savings_tier": "unknown",
+        "verified": false
+      },
+      {
+        "trace_id": "022c9ad2599f46caa9e1a749d16b309b",
+        "measurement_level": "M2",
+        "actual_usage": "incremental",
+        "baseline": "missing",
+        "outcome": "verified",
+        "attribution": [
+          "other",
+          "routing"
+        ],
+        "harness": "z0int",
+        "actual_frontier_tokens": 97,
+        "baseline_frontier_tokens": null,
+        "tokens_avoided": 0,
+        "savings_tier": "unknown",
+        "verified": true
+      },
+      {
+        "trace_id": "030826aea80749f2a6aeb184f47a05fa",
+        "measurement_level": "M2",
+        "actual_usage": "incremental",
+        "baseline": "missing",
+        "outcome": "verified",
+        "attribution": [
+          "rlm",
+          "routing"
+        ],
+        "harness": "z0int",
+        "actual_frontier_tokens": 113,
+        "baseline_frontier_tokens": null,
+        "tokens_avoided": 0,
+        "savings_tier": "unknown",
+        "verified": true
+      },
+      {
+        "trace_id": "0970ddaab48945c9a486ce9162448e6e",
+        "measurement_level": "M2",
+        "actual_usage": "incremental",
+        "baseline": "missing",
+        "outcome": "negative",
+        "attribution": [
+          "other",
+          "routing"
+        ],
+        "harness": "z0int",
+        "actual_frontier_tokens": 217,
+        "baseline_frontier_tokens": null,
+        "tokens_avoided": 0,
+        "savings_tier": "unknown",
+        "verified": false
+      },
+      {
+        "trace_id": "0e0e1e73674c443a9a39de8c09165a37",
+        "measurement_level": "M2",
+        "actual_usage": "incremental",
+        "baseline": "missing",
+        "outcome": "negative",
+        "attribution": [
+          "rlm",
+          "routing"
+        ],
+        "harness": "z0int",
+        "actual_frontier_tokens": 90,
+        "baseline_frontier_tokens": null,
+        "tokens_avoided": 0,
+        "savings_tier": "unknown",
+        "verified": false
+      },
+      {
+        "trace_id": "1aeb3db796784b8e80014568bddc2a2c",
+        "measurement_level": "M2",
+        "actual_usage": "incremental",
+        "baseline": "missing",
+        "outcome": "negative",
+        "attribution": [
+          "other",
+          "routing"
+        ],
+        "harness": "z0int",
+        "actual_frontier_tokens": 101,
+        "baseline_frontier_tokens": null,
+        "tokens_avoided": 0,
+        "savings_tier": "unknown",
+        "verified": false
+      },
+      {
+        "trace_id": "20ae9e04571c44228280a576d538764a",
+        "measurement_level": "M0",
+        "actual_usage": "unmetered",
+        "baseline": "missing",
+        "outcome": "negative",
+        "attribution": [
+          "context",
+          "omp",
+          "routing"
+        ],
+        "harness": "z0int",
+        "actual_frontier_tokens": 0,
+        "baseline_frontier_tokens": null,
+        "tokens_avoided": 0,
+        "savings_tier": "unknown",
+        "verified": false
+      },
+      {
+        "trace_id": "2ed7acedb9ea467984a050b43ebd2bc1",
+        "measurement_level": "M2",
+        "actual_usage": "incremental",
+        "baseline": "missing",
+        "outcome": "negative",
+        "attribution": [
+          "other",
+          "routing"
+        ],
+        "harness": "z0int",
+        "actual_frontier_tokens": 65,
+        "baseline_frontier_tokens": null,
+        "tokens_avoided": 0,
+        "savings_tier": "unknown",
+        "verified": false
+      },
+      {
+        "trace_id": "2f9dd171a2be4ebb9ff30422c1a844b6",
+        "measurement_level": "M2",
+        "actual_usage": "incremental",
+        "baseline": "missing",
+        "outcome": "verified",
+        "attribution": [
+          "other",
+          "routing"
+        ],
+        "harness": "z0int",
+        "actual_frontier_tokens": 95,
+        "baseline_frontier_tokens": null,
+        "tokens_avoided": 0,
+        "savings_tier": "unknown",
+        "verified": true
+      },
+      {
+        "trace_id": "35b7049c825f4738bdf78307f71a75cc",
+        "measurement_level": "M2",
+        "actual_usage": "incremental",
+        "baseline": "missing",
+        "outcome": "verified",
+        "attribution": [
+          "other",
+          "routing"
+        ],
+        "harness": "z0int",
+        "actual_frontier_tokens": 125,
+        "baseline_frontier_tokens": null,
+        "tokens_avoided": 0,
+        "savings_tier": "unknown",
+        "verified": true
+      },
+      {
+        "trace_id": "369fa71971f34950b481edccf99a4803",
+        "measurement_level": "M2",
+        "actual_usage": "incremental",
+        "baseline": "missing",
+        "outcome": "verified",
+        "attribution": [
+          "context",
+          "omp",
+          "routing"
+        ],
+        "harness": "z0int",
+        "actual_frontier_tokens": 84,
+        "baseline_frontier_tokens": null,
+        "tokens_avoided": 0,
+        "savings_tier": "unknown",
+        "verified": true
+      },
+      {
+        "trace_id": "502c3f3ce2db40da9de4c190dd7cbbf7",
+        "measurement_level": "M2",
+        "actual_usage": "incremental",
+        "baseline": "missing",
+        "outcome": "verified",
+        "attribution": [
+          "other",
+          "routing"
+        ],
+        "harness": "z0int",
+        "actual_frontier_tokens": 72,
+        "baseline_frontier_tokens": null,
+        "tokens_avoided": 0,
+        "savings_tier": "unknown",
+        "verified": true
+      },
+      {
+        "trace_id": "5350a76e795c4756bf63895d8c056039",
+        "measurement_level": "M2",
+        "actual_usage": "incremental",
+        "baseline": "missing",
+        "outcome": "verified",
+        "attribution": [
+          "other",
+          "routing"
+        ],
+        "harness": "z0int",
+        "actual_frontier_tokens": 115,
+        "baseline_frontier_tokens": null,
+        "tokens_avoided": 0,
+        "savings_tier": "unknown",
+        "verified": true
+      },
+      {
+        "trace_id": "53b48c2daa9743b689aa94971fc57e4f",
+        "measurement_level": "M2",
+        "actual_usage": "incremental",
+        "baseline": "missing",
+        "outcome": "verified",
+        "attribution": [
+          "other",
+          "routing"
+        ],
+        "harness": "z0int",
+        "actual_frontier_tokens": 131,
+        "baseline_frontier_tokens": null,
+        "tokens_avoided": 0,
+        "savings_tier": "unknown",
+        "verified": true
+      },
+      {
+        "trace_id": "55f1066fd9874933a68574c632873c0a",
+        "measurement_level": "M0",
+        "actual_usage": "unmetered",
+        "baseline": "missing",
+        "outcome": "verified",
+        "attribution": [
+          "other",
+          "routing"
+        ],
+        "harness": "z0int",
+        "actual_frontier_tokens": 0,
+        "baseline_frontier_tokens": null,
+        "tokens_avoided": 0,
+        "savings_tier": "unknown",
+        "verified": true
+      },
+      {
+        "trace_id": "57b85768164d4cf6ab2db922d83fe1d0",
+        "measurement_level": "M0",
+        "actual_usage": "unmetered",
+        "baseline": "missing",
+        "outcome": "negative",
+        "attribution": [
+          "other",
+          "routing"
+        ],
+        "harness": "z0int",
+        "actual_frontier_tokens": 0,
+        "baseline_frontier_tokens": null,
+        "tokens_avoided": 0,
+        "savings_tier": "unknown",
+        "verified": false
+      },
+      {
+        "trace_id": "5c8c1c61339245f387a506651c6cece2",
+        "measurement_level": "M2",
+        "actual_usage": "incremental",
+        "baseline": "missing",
+        "outcome": "negative",
+        "attribution": [
+          "other",
+          "routing"
+        ],
+        "harness": "z0int",
+        "actual_frontier_tokens": 169,
+        "baseline_frontier_tokens": null,
+        "tokens_avoided": 0,
+        "savings_tier": "unknown",
+        "verified": false
+      },
+      {
+        "trace_id": "67d846c36f7f484ba1c657e7a0c8490b",
+        "measurement_level": "M2",
+        "actual_usage": "incremental",
+        "baseline": "missing",
+        "outcome": "verified",
+        "attribution": [
+          "other",
+          "routing"
+        ],
+        "harness": "z0int",
+        "actual_frontier_tokens": 165,
+        "baseline_frontier_tokens": null,
+        "tokens_avoided": 0,
+        "savings_tier": "unknown",
+        "verified": true
+      },
+      {
+        "trace_id": "71d5717da8524342b697d4e59c1f10da",
+        "measurement_level": "M0",
+        "actual_usage": "unmetered",
+        "baseline": "missing",
+        "outcome": "negative",
+        "attribution": [
+          "rlm",
+          "routing"
+        ],
+        "harness": "z0int",
+        "actual_frontier_tokens": 0,
+        "baseline_frontier_tokens": null,
+        "tokens_avoided": 0,
+        "savings_tier": "unknown",
+        "verified": false
+      },
+      {
+        "trace_id": "76f3a106c328491cbfe53cc7ef937591",
+        "measurement_level": "M2",
+        "actual_usage": "incremental",
+        "baseline": "missing",
+        "outcome": "verified",
+        "attribution": [
+          "other",
+          "routing"
+        ],
+        "harness": "z0int",
+        "actual_frontier_tokens": 59,
+        "baseline_frontier_tokens": null,
+        "tokens_avoided": 0,
+        "savings_tier": "unknown",
+        "verified": true
+      },
+      {
+        "trace_id": "7832e6d5ae56458a8a1ce78e235d563b",
+        "measurement_level": "M2",
+        "actual_usage": "incremental",
+        "baseline": "missing",
+        "outcome": "verified",
+        "attribution": [
+          "rlm",
+          "routing"
+        ],
+        "harness": "z0int",
+        "actual_frontier_tokens": 113,
+        "baseline_frontier_tokens": null,
+        "tokens_avoided": 0,
+        "savings_tier": "unknown",
+        "verified": true
+      },
+      {
+        "trace_id": "81689e3f5f074b868758ecb50d30c0b6",
+        "measurement_level": "M2",
+        "actual_usage": "incremental",
+        "baseline": "missing",
+        "outcome": "verified",
+        "attribution": [
+          "rlm",
+          "routing"
+        ],
+        "harness": "z0int",
+        "actual_frontier_tokens": 160,
+        "baseline_frontier_tokens": null,
+        "tokens_avoided": 0,
+        "savings_tier": "unknown",
+        "verified": true
+      },
+      {
+        "trace_id": "914e8ea24c3e4fc4a577fd8a906485b4",
+        "measurement_level": "M2",
+        "actual_usage": "incremental",
+        "baseline": "missing",
+        "outcome": "verified",
+        "attribution": [
+          "rlm",
+          "routing"
+        ],
+        "harness": "z0int",
+        "actual_frontier_tokens": 103,
+        "baseline_frontier_tokens": null,
+        "tokens_avoided": 0,
+        "savings_tier": "unknown",
+        "verified": true
+      },
+      {
+        "trace_id": "a5bb61670414427c8ddc32d0d1c6fcfe",
+        "measurement_level": "M0",
+        "actual_usage": "unmetered",
+        "baseline": "missing",
+        "outcome": "negative",
+        "attribution": [
+          "rlm",
+          "routing"
+        ],
+        "harness": "z0int",
+        "actual_frontier_tokens": 0,
+        "baseline_frontier_tokens": null,
+        "tokens_avoided": 0,
+        "savings_tier": "unknown",
+        "verified": false
+      },
+      {
+        "trace_id": "a5d1ea1373694fdab388d2ce6009259a",
+        "measurement_level": "M0",
+        "actual_usage": "unmetered",
+        "baseline": "missing",
+        "outcome": "verified",
+        "attribution": [
+          "rlm",
+          "routing"
+        ],
+        "harness": "z0int",
+        "actual_frontier_tokens": 0,
+        "baseline_frontier_tokens": null,
+        "tokens_avoided": 0,
+        "savings_tier": "unknown",
+        "verified": true
+      },
+      {
+        "trace_id": "aa758f3d17ae4897bf932160ee2c0baa",
+        "measurement_level": "M2",
+        "actual_usage": "incremental",
+        "baseline": "missing",
+        "outcome": "negative",
+        "attribution": [
+          "context",
+          "omp",
+          "routing"
+        ],
+        "harness": "z0int",
+        "actual_frontier_tokens": 65,
+        "baseline_frontier_tokens": null,
+        "tokens_avoided": 0,
+        "savings_tier": "unknown",
+        "verified": false
+      },
+      {
+        "trace_id": "b52a53b96dc64b2c947d54b6b281fd56",
+        "measurement_level": "M2",
+        "actual_usage": "incremental",
+        "baseline": "missing",
+        "outcome": "negative",
+        "attribution": [
+          "rlm",
+          "routing"
+        ],
+        "harness": "z0int",
+        "actual_frontier_tokens": 175,
+        "baseline_frontier_tokens": null,
+        "tokens_avoided": 0,
+        "savings_tier": "unknown",
+        "verified": false
+      },
+      {
+        "trace_id": "b96c1a91ee004238817cfbfa308effa9",
+        "measurement_level": "M2",
+        "actual_usage": "incremental",
+        "baseline": "missing",
+        "outcome": "verified",
+        "attribution": [
+          "other",
+          "routing"
+        ],
+        "harness": "z0int",
+        "actual_frontier_tokens": 67,
+        "baseline_frontier_tokens": null,
+        "tokens_avoided": 0,
+        "savings_tier": "unknown",
+        "verified": true
+      },
+      {
+        "trace_id": "bbfdcaccb625434aa6c4f2a5dee2f596",
+        "measurement_level": "M0",
+        "actual_usage": "unmetered",
+        "baseline": "missing",
+        "outcome": "negative",
+        "attribution": [
+          "other",
+          "routing"
+        ],
+        "harness": "z0int",
+        "actual_frontier_tokens": 0,
+        "baseline_frontier_tokens": null,
+        "tokens_avoided": 0,
+        "savings_tier": "unknown",
+        "verified": false
+      },
+      {
+        "trace_id": "c3eb17ae4a374be1ba07f67e4a0764fc",
+        "measurement_level": "M2",
+        "actual_usage": "incremental",
+        "baseline": "missing",
+        "outcome": "negative",
+        "attribution": [
+          "rlm",
+          "routing"
+        ],
+        "harness": "z0int",
+        "actual_frontier_tokens": 106,
+        "baseline_frontier_tokens": null,
+        "tokens_avoided": 0,
+        "savings_tier": "unknown",
+        "verified": false
+      },
+      {
+        "trace_id": "c5aea1b19d65483ab67c0c80a98b7d54",
+        "measurement_level": "M2",
+        "actual_usage": "incremental",
+        "baseline": "missing",
+        "outcome": "verified",
+        "attribution": [
+          "other",
+          "routing"
+        ],
+        "harness": "z0int",
+        "actual_frontier_tokens": 129,
+        "baseline_frontier_tokens": null,
+        "tokens_avoided": 0,
+        "savings_tier": "unknown",
+        "verified": true
+      },
+      {
+        "trace_id": "c7b65f2d53e749dd8acdfb00414dcead",
+        "measurement_level": "M2",
+        "actual_usage": "incremental",
+        "baseline": "missing",
+        "outcome": "verified",
+        "attribution": [
+          "context",
+          "omp",
+          "routing"
+        ],
+        "harness": "z0int",
+        "actual_frontier_tokens": 146,
+        "baseline_frontier_tokens": null,
+        "tokens_avoided": 0,
+        "savings_tier": "unknown",
+        "verified": true
+      },
+      {
+        "trace_id": "c8722cbf8dbb48ee84483b1888b2e1c6",
+        "measurement_level": "M2",
+        "actual_usage": "incremental",
+        "baseline": "missing",
+        "outcome": "verified",
+        "attribution": [
+          "rlm",
+          "routing"
+        ],
+        "harness": "z0int",
+        "actual_frontier_tokens": 175,
+        "baseline_frontier_tokens": null,
+        "tokens_avoided": 0,
+        "savings_tier": "unknown",
+        "verified": true
+      },
+      {
+        "trace_id": "d360e3586a7c49a7afd63302f0d4c6f8",
+        "measurement_level": "M2",
+        "actual_usage": "incremental",
+        "baseline": "missing",
+        "outcome": "negative",
+        "attribution": [
+          "other",
+          "routing"
+        ],
+        "harness": "z0int",
+        "actual_frontier_tokens": 211,
+        "baseline_frontier_tokens": null,
+        "tokens_avoided": 0,
+        "savings_tier": "unknown",
+        "verified": false
+      },
+      {
+        "trace_id": "d898c322d5b04de08dda977e6f1805c8",
+        "measurement_level": "M0",
+        "actual_usage": "unmetered",
+        "baseline": "missing",
+        "outcome": "negative",
+        "attribution": [
+          "other",
+          "routing"
+        ],
+        "harness": "z0int",
+        "actual_frontier_tokens": 0,
+        "baseline_frontier_tokens": null,
+        "tokens_avoided": 0,
+        "savings_tier": "unknown",
+        "verified": false
+      },
+      {
+        "trace_id": "e3d2079849a947d9acfec756a8a1a25b",
+        "measurement_level": "M2",
+        "actual_usage": "incremental",
+        "baseline": "missing",
+        "outcome": "negative",
+        "attribution": [
+          "other",
+          "routing"
+        ],
+        "harness": "z0int",
+        "actual_frontier_tokens": 95,
+        "baseline_frontier_tokens": null,
+        "tokens_avoided": 0,
+        "savings_tier": "unknown",
+        "verified": false
+      },
+      {
+        "trace_id": "ea6c6438cd704c2db96102b37eccc5fe",
+        "measurement_level": "M2",
+        "actual_usage": "incremental",
+        "baseline": "missing",
+        "outcome": "negative",
+        "attribution": [
+          "context",
+          "omp",
+          "routing"
+        ],
+        "harness": "z0int",
+        "actual_frontier_tokens": 65,
+        "baseline_frontier_tokens": null,
+        "tokens_avoided": 0,
+        "savings_tier": "unknown",
+        "verified": false
+      },
+      {
+        "trace_id": "ec19e604af104fe3ab956a24f878959d",
+        "measurement_level": "M0",
+        "actual_usage": "unmetered",
+        "baseline": "missing",
+        "outcome": "verified",
+        "attribution": [
+          "other",
+          "routing"
+        ],
+        "harness": "z0int",
+        "actual_frontier_tokens": 0,
+        "baseline_frontier_tokens": null,
+        "tokens_avoided": 0,
+        "savings_tier": "unknown",
+        "verified": true
+      },
+      {
+        "trace_id": "f148c6fc663f4eca9262c52b4d3324b0",
+        "measurement_level": "M0",
+        "actual_usage": "unmetered",
+        "baseline": "missing",
+        "outcome": "negative",
+        "attribution": [
+          "other",
+          "routing"
+        ],
+        "harness": "z0int",
+        "actual_frontier_tokens": 0,
+        "baseline_frontier_tokens": null,
+        "tokens_avoided": 0,
+        "savings_tier": "unknown",
+        "verified": false
+      },
+      {
+        "trace_id": "f1549a29cafc4465b3939708745876a1",
+        "measurement_level": "M2",
+        "actual_usage": "incremental",
+        "baseline": "missing",
+        "outcome": "negative",
+        "attribution": [
+          "other",
+          "routing"
+        ],
+        "harness": "z0int",
+        "actual_frontier_tokens": 122,
+        "baseline_frontier_tokens": null,
+        "tokens_avoided": 0,
+        "savings_tier": "unknown",
+        "verified": false
+      },
+      {
+        "trace_id": "f22b0c6d9f184d9db898f4edf2bb73a7",
+        "measurement_level": "M2",
+        "actual_usage": "incremental",
+        "baseline": "missing",
+        "outcome": "verified",
+        "attribution": [
+          "other",
+          "routing"
+        ],
+        "harness": "z0int",
+        "actual_frontier_tokens": 120,
+        "baseline_frontier_tokens": null,
+        "tokens_avoided": 0,
+        "savings_tier": "unknown",
+        "verified": true
+      },
+      {
+        "trace_id": "f55f47bf578e433bad6056a3e157534e",
+        "measurement_level": "M0",
+        "actual_usage": "unmetered",
+        "baseline": "missing",
+        "outcome": "verified",
+        "attribution": [
+          "context",
+          "omp",
+          "routing"
+        ],
+        "harness": "z0int",
+        "actual_frontier_tokens": 0,
+        "baseline_frontier_tokens": null,
+        "tokens_avoided": 0,
+        "savings_tier": "unknown",
+        "verified": true
+      },
+      {
+        "trace_id": "f68c75a776904b3e817bfe5dd28905fe",
+        "measurement_level": "M2",
+        "actual_usage": "incremental",
+        "baseline": "missing",
+        "outcome": "negative",
+        "attribution": [
+          "rlm",
+          "routing"
+        ],
+        "harness": "z0int",
+        "actual_frontier_tokens": 98,
+        "baseline_frontier_tokens": null,
+        "tokens_avoided": 0,
+        "savings_tier": "unknown",
+        "verified": false
+      },
+      {
+        "trace_id": "f95c6b97647241a8a0eb63ec575438c8",
+        "measurement_level": "M2",
+        "actual_usage": "incremental",
+        "baseline": "missing",
+        "outcome": "negative",
+        "attribution": [
+          "context",
+          "omp",
+          "routing"
+        ],
+        "harness": "z0int",
+        "actual_frontier_tokens": 82,
+        "baseline_frontier_tokens": null,
+        "tokens_avoided": 0,
+        "savings_tier": "unknown",
+        "verified": false
+      }
+    ],
+    "measurement_levels": {
+      "M0": 11,
+      "M1": 0,
+      "M2": 33,
+      "M3": 0
+    },
+    "physical_usage": {
+      "incremental_provider_metered": 33,
+      "zero_local": 0,
+      "aggregate_only": 0,
+      "unmetered": 11,
+      "coverage_pct": 0.75
+    },
+    "counterfactuals": {
+      "paired_measured": 0,
+      "estimated": 0,
+      "missing": 44,
+      "coverage_pct": 0.0
+    },
+    "outcomes": {
+      "verified": 22,
+      "negative": 22,
+      "execution_only": 0,
+      "unknown": 0,
+      "verified_pct": 0.5
+    },
+    "by_mechanism": [
+      {
+        "mechanism": "routing",
+        "traces": 44,
+        "verified_traces": 22,
+        "metered_traces": 33,
+        "paired_baseline_traces": 0,
+        "estimated_baseline_traces": 0,
+        "baseline_coverage": 0.0
+      },
+      {
+        "mechanism": "other",
+        "traces": 24,
+        "verified_traces": 13,
+        "metered_traces": 18,
+        "paired_baseline_traces": 0,
+        "estimated_baseline_traces": 0,
+        "baseline_coverage": 0.0
+      },
+      {
+        "mechanism": "rlm",
+        "traces": 12,
+        "verified_traces": 6,
+        "metered_traces": 9,
+        "paired_baseline_traces": 0,
+        "estimated_baseline_traces": 0,
+        "baseline_coverage": 0.0
+      },
+      {
+        "mechanism": "context",
+        "traces": 8,
+        "verified_traces": 3,
+        "metered_traces": 6,
+        "paired_baseline_traces": 0,
+        "estimated_baseline_traces": 0,
+        "baseline_coverage": 0.0
+      },
+      {
+        "mechanism": "omp",
+        "traces": 8,
+        "verified_traces": 3,
+        "metered_traces": 6,
+        "paired_baseline_traces": 0,
+        "estimated_baseline_traces": 0,
+        "baseline_coverage": 0.0
+      }
+    ],
+    "measurement_gaps": [
+      {
+        "mechanism": "rlm",
+        "capability_id": "rlm.worker_needed",
+        "n_traces": 12,
+        "verified_traces": 6,
+        "actual_metered": true,
+        "baseline_coverage": 0.0,
+        "avg_actual_tokens": 94.4,
+        "avg_baseline_tokens": null,
+        "expected_information_value": "high",
+        "priority_score": 7931.0
+      },
+      {
+        "mechanism": "routing",
+        "capability_id": "rlm.worker_needed",
+        "n_traces": 12,
+        "verified_traces": 6,
+        "actual_metered": true,
+        "baseline_coverage": 0.0,
+        "avg_actual_tokens": 94.4,
+        "avg_baseline_tokens": null,
+        "expected_information_value": "high",
+        "priority_score": 7931.0
+      },
+      {
+        "mechanism": "other",
+        "capability_id": "tool_family_select",
+        "n_traces": 8,
+        "verified_traces": 4,
+        "actual_metered": true,
+        "baseline_coverage": 0.0,
+        "avg_actual_tokens": 114.9,
+        "avg_baseline_tokens": null,
+        "expected_information_value": "high",
+        "priority_score": 4595.0
+      },
+      {
+        "mechanism": "routing",
+        "capability_id": "tool_family_select",
+        "n_traces": 8,
+        "verified_traces": 4,
+        "actual_metered": true,
+        "baseline_coverage": 0.0,
+        "avg_actual_tokens": 114.9,
+        "avg_baseline_tokens": null,
+        "expected_information_value": "high",
+        "priority_score": 4595.0
+      },
+      {
+        "mechanism": "other",
+        "capability_id": "retry_or_escalate",
+        "n_traces": 8,
+        "verified_traces": 4,
+        "actual_metered": true,
+        "baseline_coverage": 0.0,
+        "avg_actual_tokens": 90.2,
+        "avg_baseline_tokens": null,
+        "expected_information_value": "high",
+        "priority_score": 3610.0
+      },
+      {
+        "mechanism": "routing",
+        "capability_id": "retry_or_escalate",
+        "n_traces": 8,
+        "verified_traces": 4,
+        "actual_metered": true,
+        "baseline_coverage": 0.0,
+        "avg_actual_tokens": 90.2,
+        "avg_baseline_tokens": null,
+        "expected_information_value": "high",
+        "priority_score": 3610.0
+      },
+      {
+        "mechanism": "other",
+        "capability_id": "verification_needed",
+        "n_traces": 8,
+        "verified_traces": 5,
+        "actual_metered": true,
+        "baseline_coverage": 0.0,
+        "avg_actual_tokens": 64.2,
+        "avg_baseline_tokens": null,
+        "expected_information_value": "high",
+        "priority_score": 3084.0
+      },
+      {
+        "mechanism": "routing",
+        "capability_id": "verification_needed",
+        "n_traces": 8,
+        "verified_traces": 5,
+        "actual_metered": true,
+        "baseline_coverage": 0.0,
+        "avg_actual_tokens": 64.2,
+        "avg_baseline_tokens": null,
+        "expected_information_value": "high",
+        "priority_score": 3084.0
+      },
+      {
+        "mechanism": "context",
+        "capability_id": "context_compress_needed",
+        "n_traces": 8,
+        "verified_traces": 3,
+        "actual_metered": true,
+        "baseline_coverage": 0.0,
+        "avg_actual_tokens": 73.2,
+        "avg_baseline_tokens": null,
+        "expected_information_value": "high",
+        "priority_score": 2344.0
+      },
+      {
+        "mechanism": "omp",
+        "capability_id": "context_compress_needed",
+        "n_traces": 8,
+        "verified_traces": 3,
+        "actual_metered": true,
+        "baseline_coverage": 0.0,
+        "avg_actual_tokens": 73.2,
+        "avg_baseline_tokens": null,
+        "expected_information_value": "high",
+        "priority_score": 2344.0
+      },
+      {
+        "mechanism": "routing",
+        "capability_id": "context_compress_needed",
+        "n_traces": 8,
+        "verified_traces": 3,
+        "actual_metered": true,
+        "baseline_coverage": 0.0,
+        "avg_actual_tokens": 73.2,
+        "avg_baseline_tokens": null,
+        "expected_information_value": "high",
+        "priority_score": 2344.0
+      }
+    ],
+    "flow_lane": {
+      "prepare_events": 0,
+      "net_prepare_value_ms": 0.0,
+      "speculation_overhead_ms": 0,
+      "latency_hidden_ms": 0.0,
+      "note": "Flow ms economics are a separate lane — not added to token savings."
+    },
+    "frontier_lane": {
+      "actual_frontier_tokens": 3874,
+      "measured_avoided": 0,
+      "estimated_avoided": 0,
+      "unknown_baseline_traces": 44
+    },
+    "accounting_invariant": {
+      "rule": "actual_frontier_tokens = SUM(incremental provider usage); tokens_avoided = baseline - actual per trace; mechanisms are attribution labels only.",
+      "incremental_only_for_physical_totals": true,
+      "aggregate_reconciliation_only": true
+    },
+    "savings_report_schema": "tokenomics.report.v1"
+  }
+}

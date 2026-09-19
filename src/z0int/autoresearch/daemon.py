@@ -5,7 +5,7 @@ from typing import Any
 
 from . import store
 from .queue import claim_next, complete_job, list_queue
-from .replay import run_abab_job
+from .replay import run_abab_job, run_contrastive_job
 from .resources import should_pause
 
 
@@ -50,7 +50,14 @@ def run_once(*, force: bool = False) -> dict[str, Any]:
     if not job:
         return {"ok": True, "skipped": True, "reason": "empty_queue"}
     try:
-        result = run_abab_job(job)
+        from .replay import _unwrap_payload
+
+        kind = _unwrap_payload(job).get("kind") or (job.get("payload") or {}).get("mutation_axis")
+        result = (
+            run_contrastive_job(job)
+            if kind == "contrastive_evidence"
+            else run_abab_job(job)
+        )
         complete_job(job["id"], status="done")
         return result
     except Exception as exc:

@@ -163,7 +163,7 @@ async function shadow(prompt: string, sessionId: string | undefined): Promise<vo
 
 export default function flyforgeJevShadow(pi: ExtensionAPI) {
 	pi.setLabel("Fly live stream (log only)");
-	pi.on("before_agent_start", async (event, ctx) => {
+	pi.on("before_agent_start", (event, ctx) => {
 		const prompt =
 			event && typeof event === "object" && "prompt" in event
 				? String((event as { prompt?: unknown }).prompt ?? "").trim()
@@ -173,11 +173,7 @@ export default function flyforgeJevShadow(pi: ExtensionAPI) {
 			ctx && typeof ctx === "object" && "sessionId" in ctx
 				? String((ctx as { sessionId?: unknown }).sessionId ?? "")
 				: process.env.OMP_SESSION_ID;
-		try {
-			await shadow(prompt, sessionId || undefined);
-		} catch {
-			return;
-		}
+		void shadow(prompt, sessionId || undefined);
 	});
 }
 

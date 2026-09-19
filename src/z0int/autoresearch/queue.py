@@ -69,11 +69,14 @@ def enqueue_trace(
         }
     credit_key = f"enqueue:{trace_id}:{verifier_id}"
     job_id = str(uuid.uuid4())
+    pl = dict(payload or {})
+    axis = str(pl.get("kind") or pl.get("mutation_axis") or "context_policy")
     body = {
         "trace_id": trace_id,
         "verifier_id": verifier_id,
-        "payload": payload or {},
-        "mutation_axis": "context_policy",
+        "payload": pl,
+        "mutation_axis": axis,
+        "kind": axis,
     }
     pr = float(priority) if priority is not None else _default_priority(payload or {})
     with _conn() as c:

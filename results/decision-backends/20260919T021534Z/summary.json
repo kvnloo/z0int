@@ -1,0 +1,353 @@
+{
+  "schema": "z0int.backends_bench.v1",
+  "contract": "decision-capability-v1",
+  "timestamp": "20260919T021534Z",
+  "fixtures_path": "/home/kvn/tmp/openjev/benchmarks/fixtures/decision-capability-v1/examples.jsonl",
+  "capabilities": [
+    "rlm.worker_needed",
+    "tool_family_select",
+    "retry_or_escalate",
+    "context_compress_needed",
+    "verification_needed"
+  ],
+  "candidates": [
+    "openjev_06b"
+  ],
+  "adapter_table": [
+    {
+      "candidate_id": "laya_421m",
+      "status": "available",
+      "reason": null,
+      "backend_impl": "laya",
+      "commercial_use": true,
+      "platforms": [
+        "cpu",
+        "mps",
+        "cuda"
+      ],
+      "license": "apache-2.0",
+      "optional": true,
+      "family": "decision_backend"
+    },
+    {
+      "candidate_id": "decider_2b",
+      "status": "available",
+      "reason": null,
+      "backend_impl": "decider",
+      "commercial_use": true,
+      "platforms": [
+        "cuda",
+        "mps"
+      ],
+      "license": "apache-2.0",
+      "optional": true,
+      "family": "decision_backend"
+    },
+    {
+      "candidate_id": "nanojev_06b",
+      "status": "available",
+      "reason": null,
+      "backend_impl": "nanojev",
+      "commercial_use": true,
+      "platforms": [
+        "cuda"
+      ],
+      "license": null,
+      "optional": false,
+      "family": "decision_backend"
+    },
+    {
+      "candidate_id": "reflex",
+      "status": "unavailable",
+      "reason": "browser_app; no headless DecisionBackend adapter for bench",
+      "backend_impl": null,
+      "commercial_use": null,
+      "platforms": [
+        "webgpu",
+        "browser"
+      ],
+      "license": null,
+      "optional": true,
+      "family": "decision_backend"
+    },
+    {
+      "candidate_id": "system_one_4b",
+      "status": "unavailable",
+      "reason": "manifest pin only; DecisionBackend adapter not implemented (CC-BY-NC-4.0 — non-commercial)",
+      "backend_impl": null,
+      "commercial_use": false,
+      "platforms": [
+        "cuda"
+      ],
+      "license": "cc-by-nc-4.0",
+      "optional": true,
+      "family": "decision_backend"
+    },
+    {
+      "candidate_id": "openjev_06b",
+      "status": "available",
+      "reason": null,
+      "backend_impl": "openjev_direct",
+      "commercial_use": true,
+      "platforms": [
+        "cuda",
+        "mps"
+      ],
+      "license": null,
+      "optional": false,
+      "family": "decision_backend"
+    },
+    {
+      "candidate_id": "openjev_4b",
+      "status": "available",
+      "reason": null,
+      "backend_impl": "openjev_direct",
+      "commercial_use": true,
+      "platforms": [
+        "cuda",
+        "mps"
+      ],
+      "license": null,
+      "optional": false,
+      "family": "decision_backend"
+    },
+    {
+      "candidate_id": "local_mb",
+      "status": "unavailable",
+      "reason": "generated mushroom_body specialist; no typed DecisionBackend adapter yet",
+      "backend_impl": null,
+      "commercial_use": true,
+      "platforms": [
+        "local"
+      ],
+      "license": null,
+      "optional": false,
+      "family": null
+    }
+  ],
+  "backends": [
+    {
+      "candidate_id": "openjev_06b",
+      "status": "available",
+      "commercial_use": true,
+      "platforms": [
+        "cuda",
+        "mps"
+      ],
+      "backend_impl": "openjev_direct",
+      "examples_total": 11,
+      "examples_ok": 11,
+      "examples_unavailable": 0,
+      "examples_error": 0,
+      "by_capability": {
+        "context_compress_needed": {
+          "denominator": 2,
+          "verified_accuracy": 0.5,
+          "mean_brier": 0.9999989381480583,
+          "abstention_accuracy": null,
+          "dangerous_false_rate": 0.0,
+          "latency_ms_p50": 30.05827299784869,
+          "latency_ms_p95": 32.90267169504659
+        },
+        "retry_or_escalate": {
+          "denominator": 2,
+          "verified_accuracy": 0.5,
+          "mean_brier": 0.9998524115008696,
+          "abstention_accuracy": null,
+          "dangerous_false_rate": 0.5,
+          "latency_ms_p50": 28.11393199954182,
+          "latency_ms_p95": 28.345531704690075
+        },
+        "rlm.worker_needed": {
+          "denominator": 3,
+          "verified_accuracy": 0.6666666666666666,
+          "mean_brier": 0.6785553935961912,
+          "abstention_accuracy": 1.0,
+          "dangerous_false_rate": 0.3333333333333333,
+          "latency_ms_p50": 29.707446999964304,
+          "latency_ms_p95": 406.66636210007704
+        },
+        "tool_family_select": {
+          "denominator": 2,
+          "verified_accuracy": 0.0,
+          "mean_brier": 1.591941033965047,
+          "abstention_accuracy": null,
+          "dangerous_false_rate": 0.0,
+          "latency_ms_p50": 31.997551501262933,
+          "latency_ms_p95": 32.77870155288838
+        },
+        "verification_needed": {
+          "denominator": 2,
+          "verified_accuracy": 0.5,
+          "mean_brier": 0.9806773107883173,
+          "abstention_accuracy": null,
+          "dangerous_false_rate": 0.0,
+          "latency_ms_p50": 37.856279999687104,
+          "latency_ms_p95": 46.971286500411225
+        }
+      },
+      "latency_ms_p50": 29.707446999964304,
+      "latency_ms_p95": 248.26737550029065,
+      "startup_ms_p50": 6934.2554719987675,
+      "throughput_rps": 14.403612964605387,
+      "vram_mb_peak": 2887.0,
+      "ram_mb_peak": 2328.31640625
+    }
+  ],
+  "pareto": {
+    "schema": "z0int.backends_bench.pareto.v1",
+    "contract": "decision-capability-v1",
+    "note": "No universal winner declared. Dominance is per-capability only.",
+    "by_capability": {
+      "rlm.worker_needed": {
+        "pareto_optimal": [],
+        "dominated_by": {},
+        "excluded_unsafe": [
+          "openjev_06b"
+        ],
+        "strata": {
+          "openjev_06b": {
+            "denominator": 3,
+            "verified_accuracy": 0.6666666666666666,
+            "mean_brier": 0.6785553935961912,
+            "abstention_accuracy": 1.0,
+            "dangerous_false_rate": 0.3333333333333333,
+            "latency_ms_p50": 29.707446999964304,
+            "latency_ms_p95": 406.66636210007704
+          }
+        }
+      },
+      "tool_family_select": {
+        "pareto_optimal": [
+          "openjev_06b"
+        ],
+        "dominated_by": {},
+        "excluded_unsafe": [],
+        "strata": {
+          "openjev_06b": {
+            "denominator": 2,
+            "verified_accuracy": 0.0,
+            "mean_brier": 1.591941033965047,
+            "abstention_accuracy": null,
+            "dangerous_false_rate": 0.0,
+            "latency_ms_p50": 31.997551501262933,
+            "latency_ms_p95": 32.77870155288838
+          }
+        }
+      },
+      "retry_or_escalate": {
+        "pareto_optimal": [],
+        "dominated_by": {},
+        "excluded_unsafe": [
+          "openjev_06b"
+        ],
+        "strata": {
+          "openjev_06b": {
+            "denominator": 2,
+            "verified_accuracy": 0.5,
+            "mean_brier": 0.9998524115008696,
+            "abstention_accuracy": null,
+            "dangerous_false_rate": 0.5,
+            "latency_ms_p50": 28.11393199954182,
+            "latency_ms_p95": 28.345531704690075
+          }
+        }
+      },
+      "context_compress_needed": {
+        "pareto_optimal": [
+          "openjev_06b"
+        ],
+        "dominated_by": {},
+        "excluded_unsafe": [],
+        "strata": {
+          "openjev_06b": {
+            "denominator": 2,
+            "verified_accuracy": 0.5,
+            "mean_brier": 0.9999989381480583,
+            "abstention_accuracy": null,
+            "dangerous_false_rate": 0.0,
+            "latency_ms_p50": 30.05827299784869,
+            "latency_ms_p95": 32.90267169504659
+          }
+        }
+      },
+      "verification_needed": {
+        "pareto_optimal": [
+          "openjev_06b"
+        ],
+        "dominated_by": {},
+        "excluded_unsafe": [],
+        "strata": {
+          "openjev_06b": {
+            "denominator": 2,
+            "verified_accuracy": 0.5,
+            "mean_brier": 0.9806773107883173,
+            "abstention_accuracy": null,
+            "dangerous_false_rate": 0.0,
+            "latency_ms_p50": 37.856279999687104,
+            "latency_ms_p95": 46.971286500411225
+          }
+        }
+      }
+    }
+  },
+  "aggregate": {
+    "examples_total": 11,
+    "examples_ok": 11,
+    "examples_unavailable": 0,
+    "examples_error": 0,
+    "by_capability": {
+      "context_compress_needed": {
+        "denominator": 2,
+        "verified_accuracy": 0.5,
+        "mean_brier": 0.9999989381480583,
+        "abstention_accuracy": null,
+        "dangerous_false_rate": 0.0,
+        "latency_ms_p50": 30.05827299784869,
+        "latency_ms_p95": 32.90267169504659
+      },
+      "retry_or_escalate": {
+        "denominator": 2,
+        "verified_accuracy": 0.5,
+        "mean_brier": 0.9998524115008696,
+        "abstention_accuracy": null,
+        "dangerous_false_rate": 0.5,
+        "latency_ms_p50": 28.11393199954182,
+        "latency_ms_p95": 28.345531704690075
+      },
+      "rlm.worker_needed": {
+        "denominator": 3,
+        "verified_accuracy": 0.6666666666666666,
+        "mean_brier": 0.6785553935961912,
+        "abstention_accuracy": 1.0,
+        "dangerous_false_rate": 0.3333333333333333,
+        "latency_ms_p50": 29.707446999964304,
+        "latency_ms_p95": 406.66636210007704
+      },
+      "tool_family_select": {
+        "denominator": 2,
+        "verified_accuracy": 0.0,
+        "mean_brier": 1.591941033965047,
+        "abstention_accuracy": null,
+        "dangerous_false_rate": 0.0,
+        "latency_ms_p50": 31.997551501262933,
+        "latency_ms_p95": 32.77870155288838
+      },
+      "verification_needed": {
+        "denominator": 2,
+        "verified_accuracy": 0.5,
+        "mean_brier": 0.9806773107883173,
+        "abstention_accuracy": null,
+        "dangerous_false_rate": 0.0,
+        "latency_ms_p50": 37.856279999687104,
+        "latency_ms_p95": 46.971286500411225
+      }
+    },
+    "latency_ms_p50": 29.707446999964304,
+    "latency_ms_p95": 248.26737550029065,
+    "startup_ms_p50": 6934.2554719987675,
+    "throughput_rps": 14.403612964605387,
+    "vram_mb_peak": 2887.0,
+    "ram_mb_peak": 2328.31640625
+  }
+}

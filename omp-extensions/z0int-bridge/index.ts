@@ -13,8 +13,10 @@
  * execution remains log_only until host consume is authorized.
  */
 import { randomUUID } from "node:crypto";
-import { spawn, type ChildProcess } from "node:child_process";
-import { createInterface, type Interface } from "node:readline";
+import { spawn } from "node:child_process";
+import type { ChildProcess } from "node:child_process";
+import { createInterface } from "node:readline";
+import type { Interface } from "node:readline";
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
@@ -32,7 +34,7 @@ const Z0_ROOT =
 	process.env.Z0INT_ROOT ||
 	// Prefer the tree that owns this extension when possible.
 	process.env.Z0INT_BRIDGE_ROOT ||
-	"/home/kvn/tmp/z0int-future-integrate";
+	"/home/kvn/tmp/openjev";
 
 const WORKER_TIMEOUT_MS = Number(process.env.Z0INT_BRIDGE_TIMEOUT_MS || 45_000);
 const HANDSHAKE_TIMEOUT_MS = 20_000;
@@ -260,6 +262,8 @@ async function ensureWorker(): Promise<WorkerHandle> {
 	current = h;
 	generation = h.generation;
 	publishCurrent(h);
+	publishShadowTransport(h);
+	maybePrewarmDecider(h);
 	return h;
 }
 
@@ -302,6 +306,8 @@ async function reload(reason: string): Promise<Jsonish> {
 		current = next;
 		generation = next.generation;
 		publishCurrent(next);
+		publishShadowTransport(next);
+		maybePrewarmDecider(next);
 		if (previous) void drainAndStop(previous);
 		return {
 			ok: true,
@@ -362,6 +368,43 @@ function estimateMeasuredFromMessages(messages: unknown[]): {
 	return { input_tokens, output_tokens, measured, provider, model };
 }
 
+
+type ShadowTransport = {
+	kind: "z0int-bridge";
+	request: (body: Jsonish, timeoutMs?: number) => Promise<Jsonish>;
+	warm: (backend: string) => Promise<Jsonish>;
+	generation?: number;
+	buildId?: string;
+	instanceId?: string;
+};
+
+function publishShadowTransport(h: WorkerHandle | null): void {
+	const g = globalThis as { __omp_z0int_bridge_transport__?: ShadowTransport };
+	if (!h) {
+		delete g.__omp_z0int_bridge_transport__;
+		return;
+	}
+	g.__omp_z0int_bridge_transport__ = {
+		kind: "z0int-bridge",
+		generation: h.generation,
+		buildId: h.buildId,
+		instanceId: h.instanceId,
+		request: (body, timeoutMs) => request(h, body, timeoutMs),
+		warm: (backend) =>
+			request(h, { op: "decision_warm", payload: { backend } }, 5_000),
+	};
+}
+
+function maybePrewarmDecider(h: WorkerHandle): void {
+	const env = String(process.env.OMP_SHADOW_WORKER_NEEDED || "").toLowerCase();
+	const enabled = env === "1" || env === "true" || env === "on";
+	if (!enabled) return;
+	// Non-blocking — never await during OMP startup / handshake.
+	void request(h, { op: "decision_warm", payload: { backend: "decider_2b" } }, 5_000).catch(() => {
+		/* fail-open */
+	});
+}
+
 export default function z0intBridge(pi: ExtensionAPI) {
 	pi.setLabel("z0int bridge v2 (resident worker, log-only)");
 
@@ -393,7 +436,6 @@ export default function z0intBridge(pi: ExtensionAPI) {
 			ctx.ui?.notify?.(`z0int bridge reload error: ${e}`, "warning");
 		}
 	});
-
 	pi.on("before_agent_start", async (event, ctx) => {
 		const prompt =
 			event && typeof event === "object" && "prompt" in event
@@ -402,25 +444,33 @@ export default function z0intBridge(pi: ExtensionAPI) {
 		const sessionId = resolveSessionId(ctx);
 		if (!prompt || prompt.startsWith("/")) return;
 
-		try {
-			const h = await ensureWorker();
-			const turn: ActiveTurn = {
-				traceId: randomUUID().replaceAll("-", ""),
-				sessionId,
-				openedGeneration: h.generation,
-			};
-			activeTurn = turn;
-			await request(h, {
-				op: "turn_open",
-				trace_id: turn.traceId,
-				session_id: turn.sessionId,
-				omp_pid: process.pid,
-				payload: { prompt, session_id: turn.sessionId, omp_pid: process.pid },
-			});
-		} catch {
-			activeTurn = null;
-		}
+		// Zero-cost shadow: identity synchronously, persistence deferred
+		const turn: ActiveTurn = {
+			traceId: randomUUID().replaceAll("-", ""),
+			sessionId,
+			openedGeneration: generation,
+		};
+		activeTurn = turn;
+
+		void (async () => {
+			try {
+				const h = await ensureWorker();
+				if (turn.openedGeneration !== h.generation) {
+					turn.openedGeneration = h.generation;
+				}
+				await request(h, {
+					op: "turn_open",
+					trace_id: turn.traceId,
+					session_id: turn.sessionId,
+					omp_pid: process.pid,
+					payload: { prompt, session_id: turn.sessionId, omp_pid: process.pid },
+				});
+			} catch {
+				/* fail-open: shadow worker unavailable is not fatal */
+			}
+		})();
 	});
+
 
 	async function closeActive(messages: unknown[], source: string): Promise<void> {
 		const turn = activeTurn;
@@ -559,4 +609,4 @@ export default function z0intBridge(pi: ExtensionAPI) {
 	});
 }
 
-export { reload, ensureWorker, BRIDGE_PROTOCOL };
+export { reload, ensureWorker, request, BRIDGE_PROTOCOL, publishShadowTransport };

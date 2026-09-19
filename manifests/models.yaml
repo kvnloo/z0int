@@ -1,32 +1,62 @@
 # z0int model deployment manifest
 # Exact revisions only. doctor/models plan never invent unpinned IDs.
+#
+# Mental model:
+#   z0intelligence = canonical roster of cognition/decision backends (below)
+#   Kerdoios       = runtime allocator over installed ResourceOffers
+#   OMP/Hermes     = execution
+#   Tokenomics     = measure latency / cost / verified quality
 schema: z0int.models.v1
 
-models:
-  openjev_06b:
-    hf: Qwen/Qwen3-0.6B
-    revision: c1899deebe5c9af36d47b04d0214f765e99987a8
-    min_vram_gb: 2
-    dtype: bfloat16
-    roles:
-      - cheap_teacher
-      - system_one
-      - skill_route
-    resident_preferred: true
+decision_roster:
+  schema: z0int.decision_roster.v1
+  description: Jev/System-One-style typed decision backends — not general LLM roster entries
+  # Benchmark contract (future): rlm.worker_needed, tool select, retry/escalate, intent route, compression gate
+  candidates:
+    - laya_421m
+    - decider_2b
+    - nanojev_06b
+    - reflex
+    - system_one_4b
+    - openjev_06b
+    - openjev_4b
 
-  openjev_4b:
-    hf: Qwen/Qwen3.5-4B
-    revision: 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
-    min_vram_gb: 10
+models:
+  laya_421m:
+    family: decision_backend
+    hf: convaiinnovations/laya
+    revision: 7c76b622dfc5cac71b2dc1c29873efe2ce509a05
+    min_vram_gb: 1
     dtype: bfloat16
+    license: apache-2.0
+    platforms: [cpu, mps, cuda]
     roles:
-      - semantic_teacher
-      - fallback
-      - direct_option_logits
+      - semantic_decision
+      - calibrated_choice
+      - system_one
     resident_preferred: false
-    note: Do not co-reside with openjev_06b or nanojev_06b on 12GB.
+    optional: true
+    note: ~421M non-autoregressive calibrated decision model; CPU/MPS-friendly.
+
+  decider_2b:
+    family: decision_backend
+    hf: Mapika/decider-2b
+    revision: 1d96be0093133e194fe18105a521b3e69be931d2
+    min_vram_gb: 4
+    dtype: bfloat16
+    license: apache-2.0
+    platforms: [cuda, mps]
+    roles:
+      - semantic_decision
+      - calibrated_choice
+      - system_one
+      - dynamic_choice
+    resident_preferred: false
+    optional: true
+    note: Qwen3.5-2B one-pass typed probabilities via decider engine.
 
   nanojev_06b:
+    family: decision_backend
     type: hf_bundle
     hf: C-Tianyu/NanoJev
     revision: 4a19595eada0857133c0d2be024f879a4077054b
@@ -45,7 +75,68 @@ models:
     resident_preferred: true
     note: Verify measured VRAM before treating min_vram_gb as a hard production fact. Managed under ~/.z0int/models/nanojev_06b/
 
+  reflex:
+    family: decision_backend
+    type: browser_app
+    source_url: https://kshetrajna12.github.io/reflex
+    github: kshetrajna12/reflex
+    min_vram_gb: 0
+    platforms: [webgpu, browser]
+    roles:
+      - semantic_decision
+      - calibrated_choice
+      - system_one
+    optional: true
+    resident_preferred: false
+    note: Qwen-based Jev/System-One browser experiment; no pinned HF checkpoint yet. Kerdoios exposes when WebGPU runtime is available.
+
+  system_one_4b:
+    family: decision_backend
+    hf: pngwn/system-one-qwen3.5-4b-scorer
+    revision: e6464dce15f013c2ef641593a85cc6afcdaea928
+    base_hf: Qwen/Qwen3.5-4B-Base
+    base_revision: 1001bb4d826a52d1f399e183466143f4da7b741b
+    min_vram_gb: 10
+    dtype: bfloat16
+    license: cc-by-nc-4.0
+    commercial_use: false
+    platforms: [cuda]
+    roles:
+      - semantic_decision
+      - calibrated_choice
+      - system_one
+    resident_preferred: false
+    optional: true
+    note: CC-BY-NC-4.0 — non-commercial only. LoRA scorer on Qwen3.5-4B-Base.
+
+  openjev_06b:
+    family: decision_backend
+    hf: Qwen/Qwen3-0.6B
+    revision: c1899de289a04d12100db370d81485cdf75e47ca
+    min_vram_gb: 2
+    dtype: bfloat16
+    roles:
+      - cheap_teacher
+      - system_one
+      - skill_route
+      - direct_option_logits
+    resident_preferred: true
+
+  openjev_4b:
+    family: decision_backend
+    hf: Qwen/Qwen3.5-4B
+    revision: 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+    min_vram_gb: 10
+    dtype: bfloat16
+    roles:
+      - semantic_teacher
+      - fallback
+      - direct_option_logits
+    resident_preferred: false
+    note: Do not co-reside with openjev_06b or nanojev_06b on 12GB.
+
   reranker_4b:
+    family: reranker
     hf: Qwen/Qwen3-Reranker-4B
     revision: 22e683669bc0f0bd69640a1354a6d0aebcfeede5
     min_vram_gb: 10
@@ -55,6 +146,7 @@ models:
     optional: true
 
   local_mb:
+    family: mushroom_body
     type: generated
     min_vram_gb: 0
     roles:
@@ -69,22 +161,33 @@ policies:
       - nanojev_06b
       - local_mb
     on_demand:
+      - laya_421m
+      - decider_2b
       - openjev_4b
       - openjev_06b
+      - system_one_4b
     never_coreside:
       - [nanojev_06b, openjev_4b]
       - [nanojev_06b, openjev_06b]
+      - [nanojev_06b, system_one_4b]
       - [openjev_06b, openjev_4b]
+      - [openjev_06b, system_one_4b]
+      - [decider_2b, system_one_4b]
   cpu_only:
     resident:
       - local_mb
-    on_demand: []
+    on_demand:
+      - laya_421m
   high_vram:
     resident:
       - nanojev_06b
       - openjev_4b
       - local_mb
     on_demand:
+      - decider_2b
       - openjev_06b
+      - system_one_4b
+      - laya_421m
     never_coreside:
       - [nanojev_06b, openjev_06b]
+      - [nanojev_06b, system_one_4b]

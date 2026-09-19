@@ -36,7 +36,8 @@ z0int = "z0int.cli:main"
 z0int-compile = "z0int.compile:main"
 z0int-train-next-action = "z0int.train:main"
 [project.optional-dependencies]
-test = ["pytest==8.4.2"]
+test = ["pytest==8.4.2", "agent-tokenomics @ git+https://github.com/kvnloo/tokenomics.git@e67d76fe2f1d52a5911abc8974489a10e89bb431"]
+analytics = ["agent-tokenomics @ git+https://github.com/kvnloo/tokenomics.git@e67d76fe2f1d52a5911abc8974489a10e89bb431"]
 games = [
   "chess>=1.11",
   "imageio>=2.37",

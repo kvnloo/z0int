@@ -412,6 +412,12 @@ def build_parser() -> argparse.ArgumentParser:
     cfm.add_argument("--provider-substr", default="xai,grok", help="Comma substrings for reference providers/models")
     cfs = cf_sub.add_parser("summary", help="Replay grade / pair inventory")
     _json_flag(cfs)
+    cfi = cf_sub.add_parser(
+        "worker-needed-ingest",
+        help="Ingest OMP rlm.worker_needed paired-replay results into Tokenomics analytics",
+    )
+    _json_flag(cfi)
+    cfi.add_argument("--limit", type=int, default=50, help="Max recent result rows to ingest")
 
     # Future compiler stack — remainder args forwarded to module CLIs.
 
@@ -428,6 +434,20 @@ def build_parser() -> argparse.ArgumentParser:
     cxr.add_argument("--allow-memory", action="store_true")
     cxr.add_argument("--input", default=None, help="JSON file with needs[]")
 
+
+    osc = sub.add_parser(
+        "os-context",
+        help="OS Episode Compiler: workspace-copilot → z0int vault (sanitized only)",
+    )
+    osc_sub = osc.add_subparsers(dest="os_context_cmd", required=True)
+    osc_imp = osc_sub.add_parser("import", help="Compile closed episodes + shadow into ~/.z0int/episodes/os_context")
+    osc_imp.add_argument("--limit", type=int, default=50000)
+    osc_imp.add_argument("--db", default=None, help="override workspace-copilot db path")
+    _json_flag(osc_imp)
+    osc_st = osc_sub.add_parser("stats", help="Live/imported os.next_context metrics")
+    _json_flag(osc_st)
+    osc_op = osc_sub.add_parser("next-operator", help="os.next_operator shadow coverage report")
+    _json_flag(osc_op)
 
     tk = sub.add_parser("task", help="Authorized verified-loop task family (worktree + checkpoint)")
     tk_sub = tk.add_subparsers(dest="task_cmd", required=True)
@@ -467,6 +487,15 @@ def build_parser() -> argparse.ArgumentParser:
     bee.add_argument("--backend", default="nanojev")
     bee.add_argument("--input", required=True, help="Path to request JSON")
     bee.add_argument("--json", action="store_true", default=True)
+    beb = be_sub.add_parser("bench", help="Pareto benchmark decision backends (decision-capability-v1)")
+    beb.add_argument("--contract", default="decision-capability-v1")
+    beb.add_argument("--backend", default=None, help="Single roster candidate id")
+    beb.add_argument("--capability", default=None, help="Filter to one capability")
+    beb.add_argument("--fixtures", default=None, help="Path to examples.jsonl")
+    beb.add_argument("--output", default=None, help="Output directory (default: results/decision-backends/<ts>)")
+    beb.add_argument("--seed", type=int, default=0, help="Benchmark seed for pair_id / counterfactual pairing")
+    beb.add_argument("--bootstrap-draws", type=int, default=500, help="Fixture-resample draws for Pareto inclusion probability")
+    beb.add_argument("--json", action="store_true")
 
 
     art = sub.add_parser("artifacts", help="Candidate artifact inspect/import/list")
@@ -481,6 +510,35 @@ def build_parser() -> argparse.ArgumentParser:
     artl = art_sub.add_parser("list", help="List installed specialists")
     _json_flag(artl)
 
+    ct = sub.add_parser(
+        "contrastive",
+        help="Contrastive evidence-sufficiency eval (Nimble-style unit; no Nimble weights)",
+    )
+    ct_sub = ct.add_subparsers(dest="contrastive_cmd", required=True)
+    ct_ev = ct_sub.add_parser("eval", help="Run four-condition probe on a family or built-in fixture")
+    ct_ev.add_argument("--family-json", default=None, help="ContrastFamily JSON path")
+    ct_ev.add_argument("--recipe-json", default=None, help="optional evidence-filter recipe JSON")
+    ct_ev.add_argument("--store", action="store_true", help="write evidence_dependency record")
+    _json_flag(ct_ev)
+    ct_fx = ct_sub.add_parser("fixture", help="Print built-in project_status contrast family")
+    _json_flag(ct_fx)
+    ct_race = ct_sub.add_parser("race", help="Ordinary vs contrastive gate on frozen families")
+    ct_race.add_argument("--families-jsonl", default=None, help="JSONL of ContrastFamily rows")
+    ct_race.add_argument("--recipe-json", default=None)
+    _json_flag(ct_race)
+
+    cps = sub.add_parser(
+        "context-state",
+        help="Frozen capability context.current_project_state",
+    )
+    cps_sub = cps.add_subparsers(dest="context_state_cmd", required=True)
+    cps_fx = cps_sub.add_parser("fixture", help="Built-in contrast family for P0 capability")
+    _json_flag(cps_fx)
+    cps_cmp = cps_sub.add_parser("compile", help="Compile episode from workspace snapshot JSON")
+    cps_cmp.add_argument("snapshot_json")
+    cps_cmp.add_argument("--store", action="store_true", help="append contrast family JSONL")
+    _json_flag(cps_cmp)
+
     ar = sub.add_parser("autoresearch", help="Verified Trajectory Superoptimizer")
     ar_sub = ar.add_subparsers(dest="autoresearch_cmd", required=True)
     for _ar_name, _ar_help in (
@@ -491,6 +549,7 @@ def build_parser() -> argparse.ArgumentParser:
         ("daemon", "Run background loop (bounded iterations unless --forever)"),
         ("report", "Recent replay results"),
         ("enqueue", "Manually enqueue a verified trace"),
+        ("research-once", "P0: Tokenomics gap → ResearchDriver → fly bench → ABAB"),
     ):
         _sp = ar_sub.add_parser(_ar_name, help=_ar_help)
         _json_flag(_sp)
@@ -500,8 +559,13 @@ def build_parser() -> argparse.ArgumentParser:
             _sp.add_argument("--poll-seconds", type=float, default=5.0)
         if _ar_name == "enqueue":
             _sp.add_argument("--trace-id", required=True)
+            _sp.add_argument("--kind", default="context_policy", choices=["context_policy", "contrastive_evidence"])
             _sp.add_argument("--verifier-id", required=True)
             _sp.add_argument("--verified-success", type=str, default="true")
+        if _ar_name == "research-once":
+            _sp.add_argument("--driver", default="agy", choices=["agy", "deterministic"])
+            _sp.add_argument("--evolution-lab-root", default=None)
+            _sp.add_argument("--force-resources", action="store_true")
 
     kerd = sub.add_parser("kerdoios", help="Kerdoios projection helpers (receipts stay authoritative)")
     kerd_sub = kerd.add_subparsers(dest="kerdoios_cmd", required=True)
@@ -631,6 +695,33 @@ def _cmd_backends(args: argparse.Namespace) -> int:
         result = backend.evaluate(request)
         payload = result_to_dict(result)
         print(json.dumps(payload, indent=2, default=str))
+        return 0
+
+    if cmd == "bench":
+        from pathlib import Path
+
+        from z0int.backends.bench import run_bench
+
+        out = run_bench(
+            contract=args.contract,
+            fixtures_path=Path(args.fixtures).expanduser() if args.fixtures else None,
+            backend_filter=args.backend,
+            capability_filter=args.capability,
+            output_dir=Path(args.output).expanduser() if args.output else None,
+            seed=args.seed,
+            bootstrap_draws=args.bootstrap_draws,
+        )
+        if args.json:
+            print(json.dumps(out, indent=2, default=str))
+        else:
+            print("z0int backends bench")
+            print(f"  contract={args.contract}")
+            print(f"  output={out.get('output_dir')}")
+            print(f"  tokenomics={out.get('tokenomics_events')}")
+            print(f"  raw={out.get('raw_jsonl')}")
+            print(f"  summary={out.get('summary_json')}")
+            print(f"  pareto={out.get('pareto_md')}")
+            print(f"  parity_ok={out.get('parity_ok')}")
         return 0
 
     print(f"unknown backends command: {cmd}", file=sys.stderr)
@@ -785,6 +876,10 @@ def main(argv: list[str] | None = None) -> int:
             return cmd_mine(args=args, as_json=as_json)
         if args.counterfactual_cmd == "summary":
             return cmd_summary(args=args, as_json=as_json)
+        if args.counterfactual_cmd == "worker-needed-ingest":
+            from .replay.worker_needed import cmd_ingest
+
+            return cmd_ingest(as_json=as_json, limit=int(getattr(args, "limit", 50) or 50))
 
 
     if args.cmd == "artifacts":
@@ -801,6 +896,61 @@ def main(argv: list[str] | None = None) -> int:
             out = {"schema": "z0int.artifacts_list.v1", "artifacts": list_artifacts()}
             _print(out, as_json=as_json)
             return 0
+
+    if args.cmd == "contrastive":
+        from . import contrastive_evidence as ce
+        import json as _json
+        if args.contrastive_cmd == "fixture":
+            fam = ce.example_project_status_family()
+            _print(fam.to_dict(), as_json=True)
+            return 0
+        if args.contrastive_cmd == "eval":
+            if getattr(args, "family_json", None):
+                fam = ce.ContrastFamily.from_dict(_json.loads(Path(args.family_json).read_text(encoding="utf-8")))
+            else:
+                fam = ce.example_project_status_family()
+            if getattr(args, "recipe_json", None):
+                recipe = _json.loads(Path(args.recipe_json).read_text(encoding="utf-8"))
+                out = ce.evaluate_recipe_on_family(fam, recipe)
+            else:
+                out = ce.evaluate_family(fam)
+            if getattr(args, "store", False):
+                path = ce.store_dependency(out["dependency"])
+                out["dependency_path"] = str(path)
+            _print(out, as_json=as_json)
+            return 0 if out.get("full_pass") else 1
+        if args.contrastive_cmd == "race":
+            from .data_recipe_race import race_data_recipes
+
+            if getattr(args, "families_jsonl", None):
+                families = []
+                for line in Path(args.families_jsonl).read_text(encoding="utf-8").splitlines():
+                    line = line.strip()
+                    if line:
+                        families.append(ce.ContrastFamily.from_dict(_json.loads(line)))
+            else:
+                families = [ce.example_project_status_family()]
+            recipe = None
+            if getattr(args, "recipe_json", None):
+                recipe = _json.loads(Path(args.recipe_json).read_text(encoding="utf-8"))
+            out = race_data_recipes(families, recipe=recipe)
+            _print(out, as_json=as_json)
+            return 0
+
+    if args.cmd == "context-state":
+        from .capabilities import context_project_state as cps
+
+        if args.context_state_cmd == "fixture":
+            _print(cps.fixture_family().to_dict(), as_json=True)
+            return 0
+        if args.context_state_cmd == "compile":
+            snap = _json.loads(Path(args.snapshot_json).read_text(encoding="utf-8"))
+            if getattr(args, "store", False):
+                out = cps.compile_and_store(snap)
+            else:
+                out = cps.compile_episode(snap)
+            _print(out, as_json=as_json)
+            return 0 if out.get("ok", True) else 1
 
     if args.cmd == "autoresearch":
         from .autoresearch import daemon as ar_daemon
@@ -827,10 +977,26 @@ def main(argv: list[str] | None = None) -> int:
             return 0
         if cmd == "enqueue":
             vs = str(getattr(args, "verified_success", "true")).lower() in ("1", "true", "yes", "y")
-            out = enqueue_trace(args.trace_id, verified_success=vs if vs else None, verifier_id=args.verifier_id)
-            # if user passed false, force not verified
-            if not vs:
-                out = enqueue_trace(args.trace_id, verified_success=False, verifier_id=args.verifier_id)
+            kind = getattr(args, "kind", None) or "context_policy"
+            pl = {"kind": kind}
+            out = enqueue_trace(
+                args.trace_id,
+                verified_success=True if vs else False,
+                verifier_id=args.verifier_id,
+                payload=pl,
+            )
+            _print(out, as_json=as_json)
+            return 0 if out.get("ok") else 1
+        if cmd == "research-once":
+            from pathlib import Path
+            from .autoresearch.research.pipeline import run_research_once
+            el = getattr(args, "evolution_lab_root", None)
+            out = run_research_once(
+                driver_name=str(getattr(args, "driver", "agy")),
+                evolution_lab_root=Path(el) if el else None,
+                force_resources=bool(getattr(args, "force_resources", False)),
+                skip_unit_tests=True,
+            )
             _print(out, as_json=as_json)
             return 0 if out.get("ok") else 1
 
@@ -840,6 +1006,27 @@ def main(argv: list[str] | None = None) -> int:
             out = export_observations(since=getattr(args, "since", None), output=getattr(args, "output", None))
             _print(out, as_json=as_json)
             return 0
+
+    if args.cmd == "os-context":
+        from . import os_context
+        from .specialists import next_operator
+
+        if args.os_context_cmd == "import":
+            db = Path(args.db).expanduser() if getattr(args, "db", None) else None
+            if db is not None:
+                out = os_context.import_from_db(db_path=db, limit=int(getattr(args, "limit", 50000) or 50000))
+            else:
+                out = os_context.import_via_cli(limit=int(getattr(args, "limit", 50000) or 50000))
+            _print(out, as_json=as_json)
+            return 0 if out.get("ok") else 1
+        if args.os_context_cmd == "stats":
+            out = os_context.stats()
+            _print(out, as_json=as_json)
+            return 0 if out.get("ok", True) else 1
+        if args.os_context_cmd == "next-operator":
+            out = next_operator.shadow_report()
+            _print(out, as_json=as_json)
+            return 0 if out.get("ok", True) else 1
 
     if args.cmd == "preflight":
         from .preflight import preflight_dict

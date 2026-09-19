@@ -104,3 +104,16 @@ def register_builtin_backends() -> None:
                 local=True,
             )
         )
+    if "decider_2b" not in _REGISTRY:
+        from .decider import DeciderBackend
+
+        register(
+            BackendSpec(
+                id="decider_2b",
+                kind="calibrated_decision",
+                description="Mapika Decider-2B typed decision model",
+                factory=lambda: DeciderBackend.for_manifest_id("decider_2b"),
+                aliases=("decider",),
+                local=True,
+            )
+        )

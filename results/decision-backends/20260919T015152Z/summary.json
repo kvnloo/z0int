@@ -1,0 +1,349 @@
+{
+  "schema": "z0int.backends_bench.v1",
+  "contract": "decision-capability-v1",
+  "timestamp": "20260919T015152Z",
+  "fixtures_path": "/home/kvn/tmp/openjev/benchmarks/fixtures/decision-capability-v1/examples.jsonl",
+  "capabilities": [
+    "rlm.worker_needed",
+    "tool_family_select",
+    "retry_or_escalate",
+    "context_compress_needed",
+    "verification_needed"
+  ],
+  "candidates": [
+    "laya_421m"
+  ],
+  "adapter_table": [
+    {
+      "candidate_id": "laya_421m",
+      "status": "available",
+      "reason": null,
+      "backend_impl": "laya",
+      "commercial_use": true,
+      "platforms": [
+        "cpu",
+        "mps",
+        "cuda"
+      ],
+      "license": "apache-2.0",
+      "optional": true,
+      "family": "decision_backend"
+    },
+    {
+      "candidate_id": "decider_2b",
+      "status": "unavailable",
+      "reason": "manifest pin only; DecisionBackend adapter not implemented",
+      "backend_impl": null,
+      "commercial_use": true,
+      "platforms": [
+        "cuda",
+        "mps"
+      ],
+      "license": "apache-2.0",
+      "optional": true,
+      "family": "decision_backend"
+    },
+    {
+      "candidate_id": "nanojev_06b",
+      "status": "available",
+      "reason": null,
+      "backend_impl": "nanojev",
+      "commercial_use": true,
+      "platforms": [
+        "cuda"
+      ],
+      "license": null,
+      "optional": false,
+      "family": "decision_backend"
+    },
+    {
+      "candidate_id": "reflex",
+      "status": "unavailable",
+      "reason": "browser_app; no headless DecisionBackend adapter for bench",
+      "backend_impl": null,
+      "commercial_use": null,
+      "platforms": [
+        "webgpu",
+        "browser"
+      ],
+      "license": null,
+      "optional": true,
+      "family": "decision_backend"
+    },
+    {
+      "candidate_id": "system_one_4b",
+      "status": "unavailable",
+      "reason": "manifest pin only; DecisionBackend adapter not implemented (CC-BY-NC-4.0 — non-commercial)",
+      "backend_impl": null,
+      "commercial_use": false,
+      "platforms": [
+        "cuda"
+      ],
+      "license": "cc-by-nc-4.0",
+      "optional": true,
+      "family": "decision_backend"
+    },
+    {
+      "candidate_id": "openjev_06b",
+      "status": "unavailable",
+      "reason": "weights not cached locally",
+      "backend_impl": "openjev_direct",
+      "commercial_use": true,
+      "platforms": [
+        "cuda",
+        "mps"
+      ],
+      "license": null,
+      "optional": false,
+      "family": "decision_backend"
+    },
+    {
+      "candidate_id": "openjev_4b",
+      "status": "available",
+      "reason": null,
+      "backend_impl": "openjev_direct",
+      "commercial_use": true,
+      "platforms": [
+        "cuda",
+        "mps"
+      ],
+      "license": null,
+      "optional": false,
+      "family": "decision_backend"
+    },
+    {
+      "candidate_id": "local_mb",
+      "status": "unavailable",
+      "reason": "generated mushroom_body specialist; no typed DecisionBackend adapter yet",
+      "backend_impl": null,
+      "commercial_use": true,
+      "platforms": [
+        "local"
+      ],
+      "license": null,
+      "optional": false,
+      "family": null
+    }
+  ],
+  "backends": [
+    {
+      "candidate_id": "laya_421m",
+      "status": "available",
+      "commercial_use": true,
+      "platforms": [
+        "cpu",
+        "mps",
+        "cuda"
+      ],
+      "backend_impl": "laya",
+      "examples_total": 11,
+      "examples_ok": 7,
+      "examples_unavailable": 0,
+      "examples_error": 4,
+      "by_capability": {
+        "context_compress_needed": {
+          "denominator": 1,
+          "verified_accuracy": 0.0,
+          "mean_brier": 0.7689554599999999,
+          "abstention_accuracy": null,
+          "dangerous_false_rate": 0.0,
+          "latency_ms_p50": 229.23022299801232,
+          "latency_ms_p95": 229.23022299801232
+        },
+        "retry_or_escalate": {
+          "denominator": 1,
+          "verified_accuracy": 0.0,
+          "mean_brier": 1.7712150199999999,
+          "abstention_accuracy": null,
+          "dangerous_false_rate": 1.0,
+          "latency_ms_p50": 243.2952200033469,
+          "latency_ms_p95": 243.2952200033469
+        },
+        "rlm.worker_needed": {
+          "denominator": 2,
+          "verified_accuracy": 0.0,
+          "mean_brier": 0.7318018399999999,
+          "abstention_accuracy": 0.0,
+          "dangerous_false_rate": 0.0,
+          "latency_ms_p50": 308.4469690002152,
+          "latency_ms_p95": 346.754292701371
+        },
+        "tool_family_select": {
+          "denominator": 1,
+          "verified_accuracy": 1.0,
+          "mean_brier": 0.50678796,
+          "abstention_accuracy": null,
+          "dangerous_false_rate": 0.0,
+          "latency_ms_p50": 296.1236659975839,
+          "latency_ms_p95": 296.1236659975839
+        },
+        "verification_needed": {
+          "denominator": 2,
+          "verified_accuracy": 1.0,
+          "mean_brier": 0.3653653,
+          "abstention_accuracy": null,
+          "dangerous_false_rate": 0.0,
+          "latency_ms_p50": 230.40240000045742,
+          "latency_ms_p95": 230.82703350482916
+        }
+      },
+      "latency_ms_p50": 243.2952200033469,
+      "latency_ms_p95": 334.5445632003247,
+      "startup_ms_p50": 7532.43957599625,
+      "throughput_rps": 3.7912682658214765,
+      "vram_mb_peak": 1069.0,
+      "ram_mb_peak": 3120.83203125
+    }
+  ],
+  "pareto": {
+    "schema": "z0int.backends_bench.pareto.v1",
+    "contract": "decision-capability-v1",
+    "note": "No universal winner declared. Dominance is per-capability only.",
+    "by_capability": {
+      "rlm.worker_needed": {
+        "pareto_optimal": [
+          "laya_421m"
+        ],
+        "dominated_by": {},
+        "strata": {
+          "laya_421m": {
+            "denominator": 2,
+            "verified_accuracy": 0.0,
+            "mean_brier": 0.7318018399999999,
+            "abstention_accuracy": 0.0,
+            "dangerous_false_rate": 0.0,
+            "latency_ms_p50": 308.4469690002152,
+            "latency_ms_p95": 346.754292701371
+          }
+        }
+      },
+      "tool_family_select": {
+        "pareto_optimal": [
+          "laya_421m"
+        ],
+        "dominated_by": {},
+        "strata": {
+          "laya_421m": {
+            "denominator": 1,
+            "verified_accuracy": 1.0,
+            "mean_brier": 0.50678796,
+            "abstention_accuracy": null,
+            "dangerous_false_rate": 0.0,
+            "latency_ms_p50": 296.1236659975839,
+            "latency_ms_p95": 296.1236659975839
+          }
+        }
+      },
+      "retry_or_escalate": {
+        "pareto_optimal": [
+          "laya_421m"
+        ],
+        "dominated_by": {},
+        "strata": {
+          "laya_421m": {
+            "denominator": 1,
+            "verified_accuracy": 0.0,
+            "mean_brier": 1.7712150199999999,
+            "abstention_accuracy": null,
+            "dangerous_false_rate": 1.0,
+            "latency_ms_p50": 243.2952200033469,
+            "latency_ms_p95": 243.2952200033469
+          }
+        }
+      },
+      "context_compress_needed": {
+        "pareto_optimal": [
+          "laya_421m"
+        ],
+        "dominated_by": {},
+        "strata": {
+          "laya_421m": {
+            "denominator": 1,
+            "verified_accuracy": 0.0,
+            "mean_brier": 0.7689554599999999,
+            "abstention_accuracy": null,
+            "dangerous_false_rate": 0.0,
+            "latency_ms_p50": 229.23022299801232,
+            "latency_ms_p95": 229.23022299801232
+          }
+        }
+      },
+      "verification_needed": {
+        "pareto_optimal": [
+          "laya_421m"
+        ],
+        "dominated_by": {},
+        "strata": {
+          "laya_421m": {
+            "denominator": 2,
+            "verified_accuracy": 1.0,
+            "mean_brier": 0.3653653,
+            "abstention_accuracy": null,
+            "dangerous_false_rate": 0.0,
+            "latency_ms_p50": 230.40240000045742,
+            "latency_ms_p95": 230.82703350482916
+          }
+        }
+      }
+    }
+  },
+  "aggregate": {
+    "examples_total": 11,
+    "examples_ok": 7,
+    "examples_unavailable": 0,
+    "examples_error": 4,
+    "by_capability": {
+      "context_compress_needed": {
+        "denominator": 1,
+        "verified_accuracy": 0.0,
+        "mean_brier": 0.7689554599999999,
+        "abstention_accuracy": null,
+        "dangerous_false_rate": 0.0,
+        "latency_ms_p50": 229.23022299801232,
+        "latency_ms_p95": 229.23022299801232
+      },
+      "retry_or_escalate": {
+        "denominator": 1,
+        "verified_accuracy": 0.0,
+        "mean_brier": 1.7712150199999999,
+        "abstention_accuracy": null,
+        "dangerous_false_rate": 1.0,
+        "latency_ms_p50": 243.2952200033469,
+        "latency_ms_p95": 243.2952200033469
+      },
+      "rlm.worker_needed": {
+        "denominator": 2,
+        "verified_accuracy": 0.0,
+        "mean_brier": 0.7318018399999999,
+        "abstention_accuracy": 0.0,
+        "dangerous_false_rate": 0.0,
+        "latency_ms_p50": 308.4469690002152,
+        "latency_ms_p95": 346.754292701371
+      },
+      "tool_family_select": {
+        "denominator": 1,
+        "verified_accuracy": 1.0,
+        "mean_brier": 0.50678796,
+        "abstention_accuracy": null,
+        "dangerous_false_rate": 0.0,
+        "latency_ms_p50": 296.1236659975839,
+        "latency_ms_p95": 296.1236659975839
+      },
+      "verification_needed": {
+        "denominator": 2,
+        "verified_accuracy": 1.0,
+        "mean_brier": 0.3653653,
+        "abstention_accuracy": null,
+        "dangerous_false_rate": 0.0,
+        "latency_ms_p50": 230.40240000045742,
+        "latency_ms_p95": 230.82703350482916
+      }
+    },
+    "latency_ms_p50": 243.2952200033469,
+    "latency_ms_p95": 334.5445632003247,
+    "startup_ms_p50": 7532.43957599625,
+    "throughput_rps": 3.7912682658214765,
+    "vram_mb_peak": 1069.0,
+    "ram_mb_peak": 3120.83203125
+  }
+}
