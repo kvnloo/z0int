@@ -84,3 +84,22 @@ Artifacts land under `results/decision-backends/<timestamp>/`:
 `raw.jsonl`, `summary.json`, `pareto.md`.
 
 Unavailable backends report `status=unavailable` with a concrete reason — never silently skipped.
+
+## Laya adapter (`laya_421m`)
+
+Pinned checkpoint: `convaiinnovations/laya@7c76b622dfc5cac71b2dc1c29873efe2ce509a05`.
+
+Architecture (from upstream `laya` runtime + HF bundle):
+
+- ModernBERT-large encoder (~421M decision head bundle in `model.safetensors`)
+- Non-autoregressive: one forward pass scores `[MASK]` markers per declared option
+- Question types: `choice`, `score`, `noul` (boolean maps to `noul`)
+- Emits calibrated option probabilities + confidence (RLCD-trained)
+- CPU/MPS/CUDA supported; default bench device is CPU via `Z0INT_LAYA_DEVICE=cpu`
+- License: Apache-2.0 (commercial use OK)
+- No generative decode; `usage.input_tokens` is encoder token count only
+
+```bash
+Z0INT_LAYA_DEVICE=cpu z0int backends bench --backend laya_421m --contract decision-capability-v1
+```
+
