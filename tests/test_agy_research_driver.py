@@ -223,3 +223,63 @@ class WorktreeIsolationTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class CanonicalizeTests(unittest.TestCase):
+    def test_k_winners_zero_resolves_to_ten_percent(self):
+        from z0int.autoresearch.research.canonicalize import effective_k_winners, effective_candidate, candidate_fingerprint
+
+        self.assertEqual(effective_k_winners(hidden=96, k_winners=0), 10)
+        self.assertEqual(effective_k_winners(hidden=128, k_winners=0), 13)
+        self.assertEqual(effective_k_winners(hidden=128, k_winners=10), 10)
+
+        a = {
+            "genome": {"architecture": {"hidden": 96, "history": 8, "family": "local_plasticity", "k_winners": 0}, "training": {"seed": 0}},
+            "dagger_rounds": 3,
+            "plasticity_lr": 0.35,
+            "plasticity_epochs": 20,
+            "k_winners": 0,
+        }
+        b = {
+            "genome": {"architecture": {"hidden": 96, "history": 8, "family": "local_plasticity", "k_winners": 0}, "training": {"seed": 0}},
+            "dagger_rounds": 3,
+            "plasticity_lr": 0.35,
+            "plasticity_epochs": 20,
+            "k_winners": 10,
+        }
+        self.assertEqual(effective_candidate(a).k_winners_effective, 10)
+        self.assertEqual(candidate_fingerprint(a), candidate_fingerprint(b))
+
+    def test_validate_rejects_effective_equal_k_winners(self):
+        # champion knobs already effective
+        knobs = {**CHAMPION_KNOBS, "k_winners": 10, "hidden": 96}
+        with self.assertRaises(ResearchProposalError):
+            validate_proposal(
+                _valid(target={"knob": "k_winners", "value": 10}),
+                search_space=SEARCH_SPACE,
+                champion_knobs=knobs,
+            )
+
+
+class PromotionTests(unittest.TestCase):
+    def test_paired_decide_requires_epsilon_improve(self):
+        from z0int.autoresearch.research.promotion import paired_decide
+
+        # incumbent ~5.923, challenger 6.560 must REJECT
+        r = paired_decide(
+            incumbent_scores=[5.9, 5.95],
+            challenger_scores=[6.56, 6.50],
+            gates_pass=True,
+            improve_epsilon=0.05,
+        )
+        self.assertEqual(r.candidate_verdict, "REJECT")
+        self.assertEqual(r.research_job, "SUCCESS")
+
+        # challenger must beat threshold = 5.925 * 0.95 ≈ 5.629
+        r2 = paired_decide(
+            incumbent_scores=[5.925, 5.925],
+            challenger_scores=[5.5, 5.4],
+            gates_pass=True,
+            improve_epsilon=0.05,
+        )
+        self.assertEqual(r2.candidate_verdict, "PROMOTED")

@@ -13,9 +13,11 @@ from pathlib import Path
 from typing import Any
 
 from ..resources import ResourceClass, can_run
+from .canonicalize import candidate_fingerprint, effective_candidate, fingerprints_equal
 from .convert import proposal_to_fly_candidate
 from .driver import ResearchDriverResult, get_driver
 from .job import create_research_job
+from .promotion import noop_result, paired_decide
 from .proposal import ResearchProposalV1
 
 
@@ -127,8 +129,16 @@ def run_research_once(
     force_resources: bool = False,
     skip_unit_tests: bool = True,
     max_experiments_note: str = "p0_single",
+    forced_proposal: ResearchProposalV1 | None = None,
+    seed_league_if_missing: bool = False,
+    paired_repeats: int = 2,
 ) -> dict[str, Any]:
-    """One bounded: gaps → job → propose → validate → train/bench → KEEP/REJECT → ABAB."""
+    """One bounded research job with promotion-integrity gates (P0.1).
+
+    Distinguishes:
+      research_job: SUCCESS | ERROR | DEFERRED
+      candidate:    NO_OP | REJECT | PROVISIONAL_KEEP | PROMOTED
+    """
     el_root = Path(
         evolution_lab_root
         or os.environ.get("EVOLUTION_LAB_ROOT")
@@ -150,6 +160,8 @@ def run_research_once(
         return {
             "ok": False,
             "stage": "resource_gate",
+            "research_job": "DEFERRED",
+            "candidate": None,
             "resource_class": "research_remote",
             "gate": research_gate,
         }
@@ -161,54 +173,94 @@ def run_research_once(
 
     from evolution_lab.abab_meta import load_or_seed, world_path
     from evolution_lab.abab_state import Evidence, Experiment, apply_mutation, save
-    from evolution_lab.autoresearch_propose import default_champion_candidate
+    from evolution_lab.autoresearch_propose import champion_from_genome, default_champion_candidate
     from evolution_lab.bench import run_fly_bench
-    from evolution_lab.select import decide_status, load_champion, load_config, save_champion
+    from evolution_lab.schema import genome_from_dict
+    from evolution_lab.select import BenchResult, load_champion, load_config, save_champion
+    from copy import deepcopy
+    from dataclasses import replace as dc_replace
 
     cfg = load_config(el_root / "autoresearch" / "config.json")
     search_space = cfg.get("search_space") or {}
     league = el_root / "runs" / "autoresearch" / "league"
     league.mkdir(parents=True, exist_ok=True)
+    eps = float((cfg.get("objective") or {}).get("improve_epsilon", 0.05))
 
     frozen_before = {
         "bench.py": _sha256(el_root / "evolution_lab" / "bench.py"),
         "select.py": _sha256(el_root / "evolution_lab" / "select.py"),
     }
 
-    tag_dir = el_root / "runs" / "autoresearch" / "agy-p0"
-    tag_dir.mkdir(parents=True, exist_ok=True)
-    champion_result = load_champion(tag_dir)
-    if champion_result is None:
-        cand = default_champion_candidate()
-        champion_blob = {"candidate": cand.to_dict(), "latency_score": None, "status": "seed"}
-        champion_knobs = {
-            "hidden": cand.genome["architecture"]["hidden"],
-            "dagger_rounds": cand.dagger_rounds,
-            "plasticity_lr": cand.plasticity_lr,
-            "plasticity_epochs": cand.plasticity_epochs,
-            "k_winners": cand.k_winners,
-            "seed": cand.genome["training"]["seed"],
-        }
-        champion_obj = None
-    else:
-        champion_blob = champion_result.to_dict()
-        c = champion_result.candidate
-        champion_knobs = {
-            "hidden": c.genome["architecture"]["hidden"],
-            "dagger_rounds": c.dagger_rounds,
-            "plasticity_lr": c.plasticity_lr,
-            "plasticity_epochs": c.plasticity_epochs,
-            "k_winners": c.k_winners,
-            "seed": c.genome["training"]["seed"],
-        }
-        champion_obj = champion_result
+    # --- Exactly one incumbent: league/champion.json ---
+    champion_obj = load_champion(league)
+    if champion_obj is None:
+        if not seed_league_if_missing and os.environ.get("Z0INT_SEED_LEAGUE", "").strip() not in {"1", "true", "yes"}:
+            return {
+                "ok": False,
+                "stage": "missing_league_champion",
+                "research_job": "ERROR",
+                "candidate": None,
+                "error": (
+                    "No runs/autoresearch/league/champion.json. "
+                    "Pass seed_league_if_missing=True for first-ever init, "
+                    "or set Z0INT_SEED_LEAGUE=1."
+                ),
+                "frozen_judge_before": frozen_before,
+            }
+        # First-ever league init from historical ABAB baseline knobs (hidden=96, dagger=3).
+        base = default_champion_candidate()
+        g = genome_from_dict(deepcopy(base.genome))
+        g = dc_replace(
+            g,
+            architecture=dc_replace(g.architecture, hidden=96, history=8, k_winners=0),
+            id="fly-league-seed-h96-d3",
+        )
+        seed_cand = champion_from_genome(
+            g,
+            dagger_rounds=3,
+            plasticity_lr=base.plasticity_lr,
+            plasticity_epochs=base.plasticity_epochs,
+            k_winners=0,
+            description="league-seed historical baseline hidden=96 dagger=3",
+        )
+        seed_bench = run_fly_bench(
+            seed_cand,
+            config=cfg,
+            run_dir=league,
+            experiment_id="league-seed-h96-d3",
+            skip_unit_tests=skip_unit_tests,
+        )
+        seed_bench.status = "keep" if seed_bench.gates_pass else "discard"
+        if not seed_bench.gates_pass:
+            return {
+                "ok": False,
+                "stage": "league_seed_failed_gates",
+                "research_job": "ERROR",
+                "candidate": "REJECT",
+                "gate_reasons": seed_bench.gate_reasons,
+                "latency_score": seed_bench.latency_score,
+                "frozen_judge_before": frozen_before,
+            }
+        save_champion(league, seed_bench)
+        champion_obj = seed_bench
+
+    assert champion_obj is not None
+    champion_blob = champion_obj.to_dict()
+    canon = effective_candidate(champion_obj.candidate)
+    champion_knobs = canon.knobs_for_brief()
+    incumbent_meta = {
+        "incumbent_experiment_id": champion_obj.experiment_id,
+        "incumbent_candidate_hash": candidate_fingerprint(champion_obj.candidate),
+        "incumbent_latency_score": champion_obj.latency_score,
+        "incumbent_canonical": canon.to_dict(),
+        "league_champion_path": str(league / "champion.json"),
+    }
 
     from z0int.autoresearch.measurement_gaps import top_measurement_gaps
 
     gaps = top_measurement_gaps(limit=12)
     world = load_or_seed(league)
     world_dict = asdict(world)
-
     hyps = [asdict(h) for h in (world.hypotheses or [])]
 
     job = create_research_job(
@@ -221,15 +273,36 @@ def run_research_once(
         product_target=cfg.get("product_target") or {},
         objective_weights=cfg.get("objective") or {},
         abab_hypotheses=hyps,
+        canonical_champion=champion_knobs,
+        incumbent=incumbent_meta,
+    )
+    # Freeze incumbent snapshot for the job (immutable for this run).
+    job.path("incumbent.json").write_text(
+        json.dumps(incumbent_meta, indent=2, default=str) + "\n", encoding="utf-8"
     )
 
-    driver = get_driver(driver_name, evolution_lab_root=el_root)
-    result: ResearchDriverResult = driver.propose(
-        job,
-        search_space=search_space,
-        champion_knobs=champion_knobs,
-        timeout_s=float(os.environ.get("AGY_PRINT_TIMEOUT_S") or 900),
-    )
+    if forced_proposal is not None:
+        from .driver import ResearchDriverResult
+
+        result = ResearchDriverResult(
+            status="ok",
+            proposal=forced_proposal,
+            duration_ms=0.0,
+            model=None,
+            effort=None,
+            command=["forced_proposal"],
+            usage=None,
+            error=None,
+        )
+        driver_name = "forced"
+    else:
+        driver = get_driver(driver_name, evolution_lab_root=el_root)
+        result: ResearchDriverResult = driver.propose(
+            job,
+            search_space=search_space,
+            champion_knobs=champion_knobs,
+            timeout_s=float(os.environ.get("AGY_PRINT_TIMEOUT_S") or 900),
+        )
     _emit_research_event(
         job_id=job.job_id,
         proposal_id=result.proposal.proposal_id if result.proposal else None,
@@ -245,39 +318,52 @@ def run_research_once(
         return {
             "ok": False,
             "stage": "propose",
+            "research_job": "ERROR",
+            "candidate": None,
             "job_id": job.job_id,
             "job_dir": str(job.job_dir),
             "driver": driver_name,
             "status": result.status,
             "error": result.error,
             "agy_command": result.command,
+            "incumbent": incumbent_meta,
             "frozen_judge_before": frozen_before,
             "resource_research": research_gate,
         }
 
     proposal: ResearchProposalV1 = result.proposal
-    cand_dir = cand_root / job.job_id
-    cand_dir.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(job.path("proposal.json"), cand_dir / "proposal.json")
+    # Validate against *effective* champion knobs (catches k_winners=10 vs raw 0).
+    from .proposal import validate_proposal
 
-    bench_gate = can_run(ResourceClass.GPU_BENCHMARK)
-    if not force_resources and bench_gate.get("pause"):
-        # Opportunistic: record pause but still allow forced P0 serial run via force_resources.
-        # Without force, defer GPU bench.
+    try:
+        proposal = validate_proposal(proposal, search_space=search_space, champion_knobs=champion_knobs)
+    except Exception as exc:  # noqa: BLE001
         out = {
-            "ok": False,
-            "stage": "gpu_benchmark_paused",
+            "ok": True,
+            "stage": "validate",
+            "research_job": "SUCCESS",
+            "candidate": "NO_OP" if "equals champion" in str(exc) else "REJECT",
+            "verdict": "NO_OP" if "equals champion" in str(exc) else "REJECT",
             "job_id": job.job_id,
             "job_dir": str(job.job_dir),
             "proposal": proposal.to_dict(),
-            "agy_command": result.command,
-            "resource_research": research_gate,
-            "resource_gpu_benchmark": bench_gate,
+            "error": str(exc),
+            "incumbent": incumbent_meta,
+            "bench_avoided": True,
+            "champion_changed": False,
             "frozen_judge_before": frozen_before,
-            "note": "research completed; GPU bench deferred under contention",
+            "frozen_judge_after": frozen_before,
+            "frozen_judge_unchanged": True,
         }
+        if out["candidate"] == "NO_OP":
+            out["promotion"] = noop_result(reason="proposal_equals_effective_champion").__dict__
         job.path("result.json").write_text(json.dumps(out, indent=2, default=str) + "\n", encoding="utf-8")
         return out
+
+    cand_dir = cand_root / job.job_id
+    cand_dir.mkdir(parents=True, exist_ok=True)
+    job.path("proposal.json").write_text(json.dumps(proposal.to_dict(), indent=2) + "\n", encoding="utf-8")
+    shutil.copy2(job.path("proposal.json"), cand_dir / "proposal.json")
 
     fly = proposal_to_fly_candidate(
         proposal,
@@ -286,31 +372,132 @@ def run_research_once(
     )
     (cand_dir / "candidate.json").write_text(json.dumps(fly.to_dict(), indent=2) + "\n", encoding="utf-8")
 
+    # --- NO_OP short-circuit on effective fingerprint ---
+    if fingerprints_equal(fly, champion_obj.candidate):
+        promo = noop_result(reason="fingerprint_match")
+        out = {
+            "ok": True,
+            "stage": "complete",
+            "research_job": promo.research_job,
+            "candidate": promo.candidate_verdict,
+            "job_id": job.job_id,
+            "job_dir": str(job.job_dir),
+            "candidate_dir": str(cand_dir),
+            "driver": driver_name,
+            "agy_command": result.command,
+            "proposal": proposal.to_dict(),
+            "candidate_body": fly.to_dict(),
+            "challenger_hash": candidate_fingerprint(fly),
+            "incumbent": incumbent_meta,
+            "promotion": promo.__dict__,
+            "bench_avoided": True,
+            "verdict": "NO_OP",
+            "gates_pass": True,
+            "latency_score": None,
+            "research_duration_ms": result.duration_ms,
+            "resource_research": research_gate,
+            "frozen_judge_before": frozen_before,
+            "frozen_judge_after": frozen_before,
+            "frozen_judge_unchanged": True,
+            "champion_changed": False,
+            "note": max_experiments_note,
+        }
+        _emit_experiment_link(
+            proposal_id=proposal.proposal_id,
+            candidate_id=fly.genome_id,
+            experiment_id=f"agy-{proposal.proposal_id}",
+            verdict="NO_OP",
+            metrics={},
+            gates_pass=True,
+        )
+        job.path("result.json").write_text(json.dumps(out, indent=2, default=str) + "\n", encoding="utf-8")
+        return out
+
+    bench_gate = can_run(ResourceClass.GPU_BENCHMARK)
+    if not force_resources and bench_gate.get("pause"):
+        out = {
+            "ok": False,
+            "stage": "gpu_benchmark_paused",
+            "research_job": "DEFERRED",
+            "candidate": None,
+            "job_id": job.job_id,
+            "job_dir": str(job.job_dir),
+            "proposal": proposal.to_dict(),
+            "agy_command": result.command,
+            "incumbent": incumbent_meta,
+            "resource_research": research_gate,
+            "resource_gpu_benchmark": bench_gate,
+            "frozen_judge_before": frozen_before,
+            "note": "research completed; GPU bench deferred under contention",
+        }
+        job.path("result.json").write_text(json.dumps(out, indent=2, default=str) + "\n", encoding="utf-8")
+        return out
+
+    # --- Paired A0/B0/A1/B1 under same machine conditions ---
     experiment_id = f"agy-{proposal.proposal_id}"
+    tag_dir = league / "paired" / experiment_id
+    tag_dir.mkdir(parents=True, exist_ok=True)
+    repeats = max(1, int(paired_repeats))
+    incumbent_scores: list[float] = []
+    challenger_scores: list[float] = []
+    challenger_benches: list[BenchResult] = []
+    arm_rows: list[dict[str, Any]] = []
     t_bench = time.perf_counter()
-    bench = run_fly_bench(
-        fly,
-        config=cfg,
-        run_dir=tag_dir,
-        experiment_id=experiment_id,
-        skip_unit_tests=skip_unit_tests,
-    )
+    for i in range(repeats):
+        # A: incumbent
+        a = run_fly_bench(
+            champion_obj.candidate,
+            config=cfg,
+            run_dir=tag_dir,
+            experiment_id=f"{experiment_id}-A{i}",
+            skip_unit_tests=skip_unit_tests,
+        )
+        incumbent_scores.append(float(a.latency_score))
+        arm_rows.append({"arm": f"A{i}", "kind": "incumbent", "latency_score": a.latency_score, "gates_pass": a.gates_pass})
+        # B: challenger
+        b = run_fly_bench(
+            fly,
+            config=cfg,
+            run_dir=tag_dir,
+            experiment_id=f"{experiment_id}-B{i}",
+            skip_unit_tests=skip_unit_tests,
+        )
+        challenger_scores.append(float(b.latency_score))
+        challenger_benches.append(b)
+        arm_rows.append({"arm": f"B{i}", "kind": "challenger", "latency_score": b.latency_score, "gates_pass": b.gates_pass})
     bench_ms = (time.perf_counter() - t_bench) * 1000.0
-    if champion_obj is not None:
-        bench.status = decide_status(bench, champion_obj, cfg)
-    else:
-        # First champion: keep only if gates pass (establish baseline).
-        bench.status = "keep" if bench.gates_pass else "discard"
 
-    champion_before = load_champion(tag_dir)
-    if bench.status == "keep":
-        save_champion(tag_dir, bench)
-    champion_after = load_champion(tag_dir)
+    gates_pass = all(b.gates_pass for b in challenger_benches)
+    promo = paired_decide(
+        incumbent_scores=incumbent_scores,
+        challenger_scores=challenger_scores,
+        gates_pass=gates_pass,
+        improve_epsilon=eps,
+        promote=True,
+    )
 
-    # ABAB update for both keep and discard (measurement evidence).
+    champion_before = load_champion(league)
+    champion_changed = False
+    if promo.candidate_verdict in {"PROVISIONAL_KEEP", "PROMOTED"} and challenger_benches:
+        best = min(challenger_benches, key=lambda x: x.latency_score)
+        best.latency_score = float(promo.challenger_mean or best.latency_score)
+        best.status = "keep"
+        best.experiment_id = experiment_id
+        save_champion(league, best)
+        promo.candidate_verdict = "PROMOTED"
+        champion_changed = True
+
+    champion_after = load_champion(league)
+
+    # ABAB update — research evidence even on NO_OP/REJECT
     try:
         hyp_id = world.hypotheses[0].id if world.hypotheses else "H1"
-        outcome = "keep" if bench.status == "keep" else "revert"
+        outcome = {
+            "PROMOTED": "keep",
+            "PROVISIONAL_KEEP": "keep",
+            "REJECT": "revert",
+            "NO_OP": "noop",
+        }.get(promo.candidate_verdict, "revert")
         world = apply_mutation(
             world,
             "SPAWN_EXPERIMENT",
@@ -319,15 +506,17 @@ def run_research_once(
                     id=experiment_id,
                     hypothesis_id=hyp_id,
                     intervention=json.dumps(proposal.target, sort_keys=True),
-                    baseline="champion",
+                    baseline="league_champion",
                     prediction=f"{proposal.expected_metric} {proposal.expected_direction}",
                     metric="latency_score",
                     outcome=outcome,
                     measured={
-                        "latency_score": bench.latency_score,
-                        "gates_pass": bench.gates_pass,
-                        "status": bench.status,
+                        "incumbent_mean": promo.incumbent_mean,
+                        "challenger_mean": promo.challenger_mean,
+                        "gates_pass": gates_pass,
+                        "candidate": promo.candidate_verdict,
                         "proposal_id": proposal.proposal_id,
+                        "arm_scores": promo.arm_scores,
                     },
                 )
             },
@@ -339,10 +528,10 @@ def run_research_once(
                 "evidence": Evidence(
                     id=f"E-{proposal.proposal_id}",
                     claim=proposal.hypothesis[:240],
-                    source="agy_research_p0",
+                    source="agy_research_p0_1",
                     source_class="measurement",
-                    confidence=0.8 if bench.status == "keep" else 0.35,
-                    counter=bench.status != "keep",
+                    confidence=0.8 if promo.candidate_verdict == "PROMOTED" else 0.35,
+                    counter=promo.candidate_verdict == "REJECT",
                 )
             },
         )
@@ -354,9 +543,9 @@ def run_research_once(
         proposal_id=proposal.proposal_id,
         candidate_id=fly.genome_id,
         experiment_id=experiment_id,
-        verdict=bench.status,
-        metrics=bench.metrics.to_dict(),
-        gates_pass=bench.gates_pass,
+        verdict=promo.candidate_verdict,
+        metrics=(challenger_benches[0].metrics.to_dict() if challenger_benches else {}),
+        gates_pass=gates_pass,
     )
 
     frozen_after = {
@@ -366,27 +555,36 @@ def run_research_once(
     out = {
         "ok": True,
         "stage": "complete",
+        "research_job": promo.research_job,
+        "candidate": promo.candidate_verdict,
         "job_id": job.job_id,
         "job_dir": str(job.job_dir),
         "candidate_dir": str(cand_dir),
         "driver": driver_name,
         "agy_command": result.command,
         "proposal": proposal.to_dict(),
-        "candidate": fly.to_dict(),
+        "candidate_body": fly.to_dict(),
+        "challenger_hash": candidate_fingerprint(fly),
         "experiment_id": experiment_id,
-        "verdict": bench.status,
-        "gates_pass": bench.gates_pass,
-        "gate_reasons": bench.gate_reasons,
-        "latency_score": bench.latency_score,
-        "metrics": bench.metrics.to_dict(),
+        "verdict": promo.candidate_verdict,  # back-compat alias
+        "gates_pass": gates_pass,
+        "gate_reasons": list({r for b in challenger_benches for r in (b.gate_reasons or [])}),
+        "latency_score": promo.challenger_mean,
+        "incumbent_latency_score_paired": promo.incumbent_mean,
+        "metrics": (challenger_benches[0].metrics.to_dict() if challenger_benches else {}),
+        "paired_arms": arm_rows,
+        "promotion": promo.__dict__,
         "bench_wall_ms": bench_ms,
+        "bench_avoided": False,
         "research_duration_ms": result.duration_ms,
         "resource_research": research_gate,
         "resource_gpu_benchmark": bench_gate,
+        "incumbent": incumbent_meta,
         "frozen_judge_before": frozen_before,
         "frozen_judge_after": frozen_after,
         "frozen_judge_unchanged": frozen_before == frozen_after,
-        "champion_changed": (
+        "champion_changed": champion_changed
+        or (
             (champion_before.experiment_id if champion_before else None)
             != (champion_after.experiment_id if champion_after else None)
         ),

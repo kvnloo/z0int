@@ -32,3 +32,15 @@ __all__ = [
     "run_research_once",
     "validate_proposal",
 ]
+
+from .canonicalize import candidate_fingerprint, effective_candidate, fingerprints_equal
+from .promotion import paired_decide, noop_result
+
+__all__ += [
+    "candidate_fingerprint",
+    "effective_candidate",
+    "fingerprints_equal",
+    "paired_decide",
+    "noop_result",
+]
+

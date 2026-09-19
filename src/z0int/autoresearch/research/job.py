@@ -41,6 +41,8 @@ def create_research_job(
     abab_hypotheses: list[dict[str, Any]] | None = None,
     profiler: dict[str, Any] | None = None,
     job_id: str | None = None,
+    canonical_champion: dict[str, Any] | None = None,
+    incumbent: dict[str, Any] | None = None,
 ) -> ResearchJob:
     jid = job_id or f"rj-{time.strftime('%Y%m%d-%H%M%S')}-{uuid.uuid4().hex[:8]}"
     job_dir = Path(root) / "runs" / "autoresearch" / "jobs" / jid
@@ -50,6 +52,10 @@ def create_research_job(
     _dump(job.path("world.json"), world or {})
     _dump(job.path("measurement-gaps.json"), measurement_gaps)
     _dump(job.path("champion.json"), champion)
+    if canonical_champion is not None:
+        _dump(job.path("canonical-champion.json"), canonical_champion)
+    if incumbent is not None:
+        _dump(job.path("incumbent.json"), incumbent)
     _dump(
         job.path("benchmark-contract.json"),
         {
@@ -96,9 +102,19 @@ def create_research_job(
 Emit **exactly one** ResearchProposalV1 JSON object.
 mutation_kind MUST be `parameter` (no source edits, no judge edits).
 
-## Current champion
+## Current champion (raw snapshot)
 ```json
-{json.dumps(champion, indent=2, default=str)[:4000]}
+{json.dumps(champion, indent=2, default=str)[:2500]}
+```
+
+## Canonical champion (effective knobs — use THESE)
+```json
+{json.dumps(canonical_champion or {}, indent=2, default=str)[:2000]}
+```
+
+## Frozen incumbent for this job
+```json
+{json.dumps(incumbent or {}, indent=2, default=str)[:1500]}
 ```
 
 ## Recent failed / discarded candidates
@@ -124,7 +140,10 @@ mutation_kind MUST be `parameter` (no source edits, no judge edits).
 Allowed knobs: hidden, dagger_rounds, plasticity_lr, plasticity_epochs, k_winners, seed.
 For `seed`, propose absolute seed = champion.seed + delta where delta ∈ seed_delta.
 target MUST be `{{"knob": <name>, "value": <allowed discrete value>}}`.
-Propose a value different from the champion's current knob value.
+Propose a value different from the *effective* champion knob values above.
+If your proposal is equivalent to the incumbent after resolving defaults
+(e.g. k_winners=0 with hidden=96 already means effective k_winners=10),
+it will be rejected as NO_OP without benchmarking.
 
 ## Output
 Return only ResearchProposalV1 matching the provided JSON schema.

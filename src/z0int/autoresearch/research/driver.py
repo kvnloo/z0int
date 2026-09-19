@@ -32,6 +32,7 @@ class ResearchDriverResult:
     raw: dict[str, Any] | None = None
     error: str | None = None
     command: list[str] | None = None
+    usage: dict[str, Any] | None = None
 
 
 class ResearchDriver(Protocol):
