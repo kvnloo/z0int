@@ -109,6 +109,35 @@ def select_policy(vram_gb: float | None, policies: dict[str, Any]) -> str:
     return "cpu_only" if "cpu_only" in policies else "twelve_gb"
 
 
+def decision_roster(*, manifest: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Canonical Jev/System-One decision backend roster from manifests/models.*."""
+    man = manifest or load_manifest()
+    roster = man.get("decision_roster") or {}
+    candidates = list(roster.get("candidates") or [])
+    models = man.get("models") or {}
+    entries = {
+        cid: {
+            "family": (models.get(cid) or {}).get("family"),
+            "hf": (models.get(cid) or {}).get("hf"),
+            "revision": (models.get(cid) or {}).get("revision"),
+            "type": (models.get(cid) or {}).get("type", "hf"),
+            "platforms": (models.get(cid) or {}).get("platforms"),
+            "license": (models.get(cid) or {}).get("license"),
+            "commercial_use": (models.get(cid) or {}).get("commercial_use"),
+            "optional": (models.get(cid) or {}).get("optional"),
+            "roles": (models.get(cid) or {}).get("roles") or [],
+        }
+        for cid in candidates
+        if cid in models
+    }
+    return {
+        "schema": roster.get("schema") or "z0int.decision_roster.v1",
+        "description": roster.get("description"),
+        "candidates": candidates,
+        "entries": entries,
+    }
+
+
 def plan_models(*, manifest: dict[str, Any] | None = None, vram_gb: float | None = None) -> dict[str, Any]:
     man = manifest or load_manifest()
     models = man.get("models") or {}
