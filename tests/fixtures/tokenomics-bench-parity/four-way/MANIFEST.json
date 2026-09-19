@@ -1,0 +1,13 @@
+{
+  "schema": "z0int.tokenomics_bench_parity.v1",
+  "contract": "decision-capability-v1",
+  "source_run": "20260919T022327Z",
+  "z0int_git_sha": "664476b",
+  "backends": ["openjev_06b", "decider_2b", "nanojev_06b", "laya_421m"],
+  "device_config": {
+    "Z0INT_LAYA_DEVICE": "cpu",
+    "Z0INT_DECIDER_DEVICE": "cuda",
+    "Z0INT_DECIDER_USE_GRAPHS": "0"
+  },
+  "note": "Golden parity fixture before Tokenomics canonical measurement migration."
+}
