@@ -412,6 +412,12 @@ def build_parser() -> argparse.ArgumentParser:
     cfm.add_argument("--provider-substr", default="xai,grok", help="Comma substrings for reference providers/models")
     cfs = cf_sub.add_parser("summary", help="Replay grade / pair inventory")
     _json_flag(cfs)
+    cfi = cf_sub.add_parser(
+        "worker-needed-ingest",
+        help="Ingest OMP rlm.worker_needed paired-replay results into Tokenomics analytics",
+    )
+    _json_flag(cfi)
+    cfi.add_argument("--limit", type=int, default=50, help="Max recent result rows to ingest")
 
     # Future compiler stack — remainder args forwarded to module CLIs.
 
@@ -870,6 +876,10 @@ def main(argv: list[str] | None = None) -> int:
             return cmd_mine(args=args, as_json=as_json)
         if args.counterfactual_cmd == "summary":
             return cmd_summary(args=args, as_json=as_json)
+        if args.counterfactual_cmd == "worker-needed-ingest":
+            from .replay.worker_needed import cmd_ingest
+
+            return cmd_ingest(as_json=as_json, limit=int(getattr(args, "limit", 50) or 50))
 
 
     if args.cmd == "artifacts":
