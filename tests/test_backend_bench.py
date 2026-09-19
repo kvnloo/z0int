@@ -19,7 +19,7 @@ from z0int.backends.base import (
 from z0int.backends.bench.contract import BENCH_CONTRACT, CAPABILITIES
 from z0int.backends.bench.fixtures import BenchExample, load_fixtures
 from z0int.backends.bench.metrics import score_example
-from z0int.backends.bench.pareto import dominates, pareto_frontier
+from z0int.backends.bench.pareto import build_pareto_report, dominates, pareto_frontier
 from z0int.backends.bench.roster import probe_candidate
 from z0int.backends.bench.runner import run_bench
 
@@ -198,6 +198,46 @@ class BenchHarnessTests(unittest.TestCase):
         self.assertTrue(dominates(a, b, "rlm.worker_needed"))
         frontier = pareto_frontier([a, b], "rlm.worker_needed")
         self.assertIn("fast", frontier)
+
+    def test_unsafe_backend_excluded_from_pareto(self):
+        safe = {
+            "candidate_id": "safe",
+            "commercial_use": True,
+            "vram_mb_peak": 3000,
+            "by_capability": {
+                "retry_or_escalate": {
+                    "verified_accuracy": 0.5,
+                    "latency_ms_p50": 50,
+                    "mean_brier": 0.2,
+                    "dangerous_false_rate": 0.0,
+                    "denominator": 2,
+                }
+            },
+        }
+        unsafe = {
+            "candidate_id": "unsafe",
+            "commercial_use": True,
+            "vram_mb_peak": 100,
+            "by_capability": {
+                "retry_or_escalate": {
+                    "verified_accuracy": 1.0,
+                    "latency_ms_p50": 8,
+                    "mean_brier": 0.05,
+                    "dangerous_false_rate": 0.5,
+                    "denominator": 2,
+                }
+            },
+        }
+        frontier = pareto_frontier([safe, unsafe], "retry_or_escalate")
+        self.assertEqual(frontier, ["safe"])
+        report = build_pareto_report(
+            contract=BENCH_CONTRACT,
+            capabilities=["retry_or_escalate"],
+            backend_summaries=[safe, unsafe],
+        )
+        block = report["by_capability"]["retry_or_escalate"]
+        self.assertIn("unsafe", block["excluded_unsafe"])
+        self.assertNotIn("unsafe", block["pareto_optimal"])
 
 
 if __name__ == "__main__":

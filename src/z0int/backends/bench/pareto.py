@@ -23,9 +23,23 @@ def _better(a: float | None, b: float | None, *, higher_is_better: bool) -> bool
     return a > b if higher_is_better else a < b
 
 
+def _pareto_eligible(stats: dict[str, Any] | None) -> bool:
+    """Hard constraint: any dangerous false prediction excludes a backend from the frontier."""
+    if not stats:
+        return False
+    dang = stats.get("dangerous_false_rate")
+    if dang is not None and float(dang) > 0:
+        return False
+    return True
+
+
 def dominates(a: dict[str, Any], b: dict[str, Any], cap: str) -> bool:
     pa, pb = _point(a, cap), _point(b, cap)
     if pa["quality"] is None or pb["quality"] is None:
+        return False
+    a_stats = (a.get("by_capability") or {}).get(cap) or {}
+    b_stats = (b.get("by_capability") or {}).get(cap) or {}
+    if not _pareto_eligible(a_stats) or not _pareto_eligible(b_stats):
         return False
     checks = [
         _better(pa["quality"], pb["quality"], higher_is_better=True),
@@ -43,14 +57,19 @@ def dominates(a: dict[str, Any], b: dict[str, Any], cap: str) -> bool:
 
 
 def pareto_frontier(backends: list[dict[str, Any]], cap: str) -> list[str]:
-    ids = [str(b["candidate_id"]) for b in backends if (b.get("by_capability") or {}).get(cap)]
+    eligible = [
+        b
+        for b in backends
+        if _pareto_eligible((b.get("by_capability") or {}).get(cap))
+    ]
+    ids = [str(b["candidate_id"]) for b in eligible]
     frontier: list[str] = []
     for i, bid in enumerate(ids):
         dominated = False
         for j, other in enumerate(ids):
             if i == j:
                 continue
-            if dominates(backends[j], backends[i], cap):
+            if dominates(eligible[j], eligible[i], cap):
                 dominated = True
                 break
         if not dominated:
@@ -59,13 +78,18 @@ def pareto_frontier(backends: list[dict[str, Any]], cap: str) -> list[str]:
 
 
 def dominated_by(backends: list[dict[str, Any]], cap: str) -> dict[str, list[str]]:
-    ids = [str(b["candidate_id"]) for b in backends if (b.get("by_capability") or {}).get(cap)]
+    eligible = [
+        b
+        for b in backends
+        if _pareto_eligible((b.get("by_capability") or {}).get(cap))
+    ]
+    ids = [str(b["candidate_id"]) for b in eligible]
     out: dict[str, list[str]] = {i: [] for i in ids}
     for i, a_id in enumerate(ids):
         for j, b_id in enumerate(ids):
             if i == j:
                 continue
-            if dominates(backends[j], backends[i], cap):
+            if dominates(eligible[j], eligible[i], cap):
                 out[a_id].append(b_id)
     return {k: v for k, v in out.items() if v}
 
@@ -78,14 +102,20 @@ def build_pareto_report(
 ) -> dict[str, Any]:
     per_cap: dict[str, Any] = {}
     for cap in capabilities:
+        strata = {
+            b["candidate_id"]: (b.get("by_capability") or {}).get(cap)
+            for b in backend_summaries
+            if (b.get("by_capability") or {}).get(cap)
+        }
         per_cap[cap] = {
             "pareto_optimal": pareto_frontier(backend_summaries, cap),
             "dominated_by": dominated_by(backend_summaries, cap),
-            "strata": {
-                b["candidate_id"]: (b.get("by_capability") or {}).get(cap)
-                for b in backend_summaries
-                if (b.get("by_capability") or {}).get(cap)
-            },
+            "excluded_unsafe": [
+                bid
+                for bid, stats in strata.items()
+                if stats and not _pareto_eligible(stats)
+            ],
+            "strata": strata,
         }
     return {
         "schema": "z0int.backends_bench.pareto.v1",
@@ -109,6 +139,9 @@ def render_pareto_md(report: dict[str, Any]) -> str:
         lines.append("")
         optimal = block.get("pareto_optimal") or []
         lines.append(f"**Pareto-optimal:** {', '.join(optimal) if optimal else '(none with runnable results)'}")
+        excluded = block.get("excluded_unsafe") or []
+        if excluded:
+            lines.append(f"**Excluded (dangerous false > 0):** {', '.join(excluded)}")
         lines.append("")
         lines.append("| backend | accuracy | p50 ms | mean Brier | dangerous | denom |")
         lines.append("|---------|----------|--------|------------|-----------|-------|")

@@ -226,9 +226,16 @@ def run_bench(
             "nanojev": "nanojev_06b",
             "openjev_06b": "openjev_06b",
             "openjev_4b": "openjev_4b",
+            "laya": "laya_421m",
         }
-        bid = aliases.get(backend_filter, backend_filter)
-        candidates = [bid] if bid in ROSTER_CANDIDATES else [backend_filter]
+        requested = [x.strip() for x in str(backend_filter).split(",") if x.strip()]
+        candidates = []
+        for raw in requested:
+            bid = aliases.get(raw, raw)
+            if bid not in ROSTER_CANDIDATES:
+                raise ValueError(f"unknown backend candidate {raw!r}")
+            if bid not in candidates:
+                candidates.append(bid)
 
     ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     out_dir = output_dir or (_results_root() / ts)
