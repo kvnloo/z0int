@@ -487,6 +487,7 @@ def build_parser() -> argparse.ArgumentParser:
     beb.add_argument("--capability", default=None, help="Filter to one capability")
     beb.add_argument("--fixtures", default=None, help="Path to examples.jsonl")
     beb.add_argument("--output", default=None, help="Output directory (default: results/decision-backends/<ts>)")
+    beb.add_argument("--seed", type=int, default=0, help="Benchmark seed for pair_id / counterfactual pairing")
     beb.add_argument("--json", action="store_true")
 
 
@@ -695,6 +696,7 @@ def _cmd_backends(args: argparse.Namespace) -> int:
             backend_filter=args.backend,
             capability_filter=args.capability,
             output_dir=Path(args.output).expanduser() if args.output else None,
+            seed=args.seed,
         )
         if args.json:
             print(json.dumps(out, indent=2, default=str))
@@ -702,9 +704,11 @@ def _cmd_backends(args: argparse.Namespace) -> int:
             print("z0int backends bench")
             print(f"  contract={args.contract}")
             print(f"  output={out.get('output_dir')}")
+            print(f"  tokenomics={out.get('tokenomics_events')}")
             print(f"  raw={out.get('raw_jsonl')}")
             print(f"  summary={out.get('summary_json')}")
             print(f"  pareto={out.get('pareto_md')}")
+            print(f"  parity_ok={out.get('parity_ok')}")
         return 0
 
     print(f"unknown backends command: {cmd}", file=sys.stderr)

@@ -87,7 +87,18 @@ z0int backends bench --backend nanojev_06b --capability rlm.worker_needed --json
 ```
 
 Artifacts land under `results/decision-backends/<timestamp>/`:
-`raw.jsonl`, `summary.json`, `pareto.md`.
+
+| File | Role |
+|------|------|
+| `tokenomics-events.jsonl` | **Canonical raw measurement** (Tokenomics traces) |
+| `run-manifest.json` | Run identity: git SHAs, dataset hash, device env |
+| `raw.jsonl` | Materialized compatibility view (derived from Tokenomics) |
+| `summary.json` | Aggregate metrics + eligibility + Pareto |
+| `analytics.json` / `analytics.md` | Quality, safety, latency, paired comparisons |
+| `coverage.json` / `coverage.md` | Measurement coverage gaps (Tokenomics) |
+| `pareto.md` | Human-readable Pareto report |
+
+Install analytics dependency: `pip install -e ".[analytics]"` (pins `agent-tokenomics`).
 
 Unavailable backends report `status=unavailable` with a concrete reason — never silently skipped.
 

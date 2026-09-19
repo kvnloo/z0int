@@ -160,6 +160,8 @@ class BenchHarnessTests(unittest.TestCase):
                 roster_mod.probe_candidate = old_probe
 
             self.assertTrue(out["ok"])
+            self.assertTrue(out["parity_ok"], msg=out.get("parity_errors"))
+            self.assertTrue(Path(out["tokenomics_events"]).is_file())
             raw = Path(out["raw_jsonl"]).read_text(encoding="utf-8").strip().splitlines()
             self.assertEqual(len(raw), len(examples))
             row = json.loads(raw[0])
