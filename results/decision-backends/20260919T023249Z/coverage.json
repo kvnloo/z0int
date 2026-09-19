@@ -1,0 +1,997 @@
+{
+  "schema": "tokenomics.coverage.v1",
+  "range": "7d",
+  "period": {
+    "start_ts": 1789180414.4727688,
+    "end_ts": 1789785214.4727688,
+    "start_iso": "2026-09-12T02:33:34.472769+00:00",
+    "end_iso": "2026-09-19T02:33:34.472769+00:00"
+  },
+  "sources": [],
+  "n_events": 132,
+  "n_traces": 44,
+  "traces": [
+    {
+      "trace_id": "0011d76b6ebd4f849a5ff4b05baa283c",
+      "measurement_level": "M2",
+      "actual_usage": "incremental",
+      "baseline": "missing",
+      "outcome": "negative",
+      "attribution": [
+        "context",
+        "omp",
+        "routing"
+      ],
+      "harness": "z0int",
+      "actual_frontier_tokens": 144,
+      "baseline_frontier_tokens": null,
+      "tokens_avoided": 0,
+      "savings_tier": "unknown",
+      "verified": false
+    },
+    {
+      "trace_id": "022c9ad2599f46caa9e1a749d16b309b",
+      "measurement_level": "M2",
+      "actual_usage": "incremental",
+      "baseline": "missing",
+      "outcome": "verified",
+      "attribution": [
+        "other",
+        "routing"
+      ],
+      "harness": "z0int",
+      "actual_frontier_tokens": 97,
+      "baseline_frontier_tokens": null,
+      "tokens_avoided": 0,
+      "savings_tier": "unknown",
+      "verified": true
+    },
+    {
+      "trace_id": "030826aea80749f2a6aeb184f47a05fa",
+      "measurement_level": "M2",
+      "actual_usage": "incremental",
+      "baseline": "missing",
+      "outcome": "verified",
+      "attribution": [
+        "rlm",
+        "routing"
+      ],
+      "harness": "z0int",
+      "actual_frontier_tokens": 113,
+      "baseline_frontier_tokens": null,
+      "tokens_avoided": 0,
+      "savings_tier": "unknown",
+      "verified": true
+    },
+    {
+      "trace_id": "0970ddaab48945c9a486ce9162448e6e",
+      "measurement_level": "M2",
+      "actual_usage": "incremental",
+      "baseline": "missing",
+      "outcome": "negative",
+      "attribution": [
+        "other",
+        "routing"
+      ],
+      "harness": "z0int",
+      "actual_frontier_tokens": 217,
+      "baseline_frontier_tokens": null,
+      "tokens_avoided": 0,
+      "savings_tier": "unknown",
+      "verified": false
+    },
+    {
+      "trace_id": "0e0e1e73674c443a9a39de8c09165a37",
+      "measurement_level": "M2",
+      "actual_usage": "incremental",
+      "baseline": "missing",
+      "outcome": "negative",
+      "attribution": [
+        "rlm",
+        "routing"
+      ],
+      "harness": "z0int",
+      "actual_frontier_tokens": 90,
+      "baseline_frontier_tokens": null,
+      "tokens_avoided": 0,
+      "savings_tier": "unknown",
+      "verified": false
+    },
+    {
+      "trace_id": "1aeb3db796784b8e80014568bddc2a2c",
+      "measurement_level": "M2",
+      "actual_usage": "incremental",
+      "baseline": "missing",
+      "outcome": "negative",
+      "attribution": [
+        "other",
+        "routing"
+      ],
+      "harness": "z0int",
+      "actual_frontier_tokens": 101,
+      "baseline_frontier_tokens": null,
+      "tokens_avoided": 0,
+      "savings_tier": "unknown",
+      "verified": false
+    },
+    {
+      "trace_id": "20ae9e04571c44228280a576d538764a",
+      "measurement_level": "M0",
+      "actual_usage": "unmetered",
+      "baseline": "missing",
+      "outcome": "negative",
+      "attribution": [
+        "context",
+        "omp",
+        "routing"
+      ],
+      "harness": "z0int",
+      "actual_frontier_tokens": 0,
+      "baseline_frontier_tokens": null,
+      "tokens_avoided": 0,
+      "savings_tier": "unknown",
+      "verified": false
+    },
+    {
+      "trace_id": "2ed7acedb9ea467984a050b43ebd2bc1",
+      "measurement_level": "M2",
+      "actual_usage": "incremental",
+      "baseline": "missing",
+      "outcome": "negative",
+      "attribution": [
+        "other",
+        "routing"
+      ],
+      "harness": "z0int",
+      "actual_frontier_tokens": 65,
+      "baseline_frontier_tokens": null,
+      "tokens_avoided": 0,
+      "savings_tier": "unknown",
+      "verified": false
+    },
+    {
+      "trace_id": "2f9dd171a2be4ebb9ff30422c1a844b6",
+      "measurement_level": "M2",
+      "actual_usage": "incremental",
+      "baseline": "missing",
+      "outcome": "verified",
+      "attribution": [
+        "other",
+        "routing"
+      ],
+      "harness": "z0int",
+      "actual_frontier_tokens": 95,
+      "baseline_frontier_tokens": null,
+      "tokens_avoided": 0,
+      "savings_tier": "unknown",
+      "verified": true
+    },
+    {
+      "trace_id": "35b7049c825f4738bdf78307f71a75cc",
+      "measurement_level": "M2",
+      "actual_usage": "incremental",
+      "baseline": "missing",
+      "outcome": "verified",
+      "attribution": [
+        "other",
+        "routing"
+      ],
+      "harness": "z0int",
+      "actual_frontier_tokens": 125,
+      "baseline_frontier_tokens": null,
+      "tokens_avoided": 0,
+      "savings_tier": "unknown",
+      "verified": true
+    },
+    {
+      "trace_id": "369fa71971f34950b481edccf99a4803",
+      "measurement_level": "M2",
+      "actual_usage": "incremental",
+      "baseline": "missing",
+      "outcome": "verified",
+      "attribution": [
+        "context",
+        "omp",
+        "routing"
+      ],
+      "harness": "z0int",
+      "actual_frontier_tokens": 84,
+      "baseline_frontier_tokens": null,
+      "tokens_avoided": 0,
+      "savings_tier": "unknown",
+      "verified": true
+    },
+    {
+      "trace_id": "502c3f3ce2db40da9de4c190dd7cbbf7",
+      "measurement_level": "M2",
+      "actual_usage": "incremental",
+      "baseline": "missing",
+      "outcome": "verified",
+      "attribution": [
+        "other",
+        "routing"
+      ],
+      "harness": "z0int",
+      "actual_frontier_tokens": 72,
+      "baseline_frontier_tokens": null,
+      "tokens_avoided": 0,
+      "savings_tier": "unknown",
+      "verified": true
+    },
+    {
+      "trace_id": "5350a76e795c4756bf63895d8c056039",
+      "measurement_level": "M2",
+      "actual_usage": "incremental",
+      "baseline": "missing",
+      "outcome": "verified",
+      "attribution": [
+        "other",
+        "routing"
+      ],
+      "harness": "z0int",
+      "actual_frontier_tokens": 115,
+      "baseline_frontier_tokens": null,
+      "tokens_avoided": 0,
+      "savings_tier": "unknown",
+      "verified": true
+    },
+    {
+      "trace_id": "53b48c2daa9743b689aa94971fc57e4f",
+      "measurement_level": "M2",
+      "actual_usage": "incremental",
+      "baseline": "missing",
+      "outcome": "verified",
+      "attribution": [
+        "other",
+        "routing"
+      ],
+      "harness": "z0int",
+      "actual_frontier_tokens": 131,
+      "baseline_frontier_tokens": null,
+      "tokens_avoided": 0,
+      "savings_tier": "unknown",
+      "verified": true
+    },
+    {
+      "trace_id": "55f1066fd9874933a68574c632873c0a",
+      "measurement_level": "M0",
+      "actual_usage": "unmetered",
+      "baseline": "missing",
+      "outcome": "verified",
+      "attribution": [
+        "other",
+        "routing"
+      ],
+      "harness": "z0int",
+      "actual_frontier_tokens": 0,
+      "baseline_frontier_tokens": null,
+      "tokens_avoided": 0,
+      "savings_tier": "unknown",
+      "verified": true
+    },
+    {
+      "trace_id": "57b85768164d4cf6ab2db922d83fe1d0",
+      "measurement_level": "M0",
+      "actual_usage": "unmetered",
+      "baseline": "missing",
+      "outcome": "negative",
+      "attribution": [
+        "other",
+        "routing"
+      ],
+      "harness": "z0int",
+      "actual_frontier_tokens": 0,
+      "baseline_frontier_tokens": null,
+      "tokens_avoided": 0,
+      "savings_tier": "unknown",
+      "verified": false
+    },
+    {
+      "trace_id": "5c8c1c61339245f387a506651c6cece2",
+      "measurement_level": "M2",
+      "actual_usage": "incremental",
+      "baseline": "missing",
+      "outcome": "negative",
+      "attribution": [
+        "other",
+        "routing"
+      ],
+      "harness": "z0int",
+      "actual_frontier_tokens": 169,
+      "baseline_frontier_tokens": null,
+      "tokens_avoided": 0,
+      "savings_tier": "unknown",
+      "verified": false
+    },
+    {
+      "trace_id": "67d846c36f7f484ba1c657e7a0c8490b",
+      "measurement_level": "M2",
+      "actual_usage": "incremental",
+      "baseline": "missing",
+      "outcome": "verified",
+      "attribution": [
+        "other",
+        "routing"
+      ],
+      "harness": "z0int",
+      "actual_frontier_tokens": 165,
+      "baseline_frontier_tokens": null,
+      "tokens_avoided": 0,
+      "savings_tier": "unknown",
+      "verified": true
+    },
+    {
+      "trace_id": "71d5717da8524342b697d4e59c1f10da",
+      "measurement_level": "M0",
+      "actual_usage": "unmetered",
+      "baseline": "missing",
+      "outcome": "negative",
+      "attribution": [
+        "rlm",
+        "routing"
+      ],
+      "harness": "z0int",
+      "actual_frontier_tokens": 0,
+      "baseline_frontier_tokens": null,
+      "tokens_avoided": 0,
+      "savings_tier": "unknown",
+      "verified": false
+    },
+    {
+      "trace_id": "76f3a106c328491cbfe53cc7ef937591",
+      "measurement_level": "M2",
+      "actual_usage": "incremental",
+      "baseline": "missing",
+      "outcome": "verified",
+      "attribution": [
+        "other",
+        "routing"
+      ],
+      "harness": "z0int",
+      "actual_frontier_tokens": 59,
+      "baseline_frontier_tokens": null,
+      "tokens_avoided": 0,
+      "savings_tier": "unknown",
+      "verified": true
+    },
+    {
+      "trace_id": "7832e6d5ae56458a8a1ce78e235d563b",
+      "measurement_level": "M2",
+      "actual_usage": "incremental",
+      "baseline": "missing",
+      "outcome": "verified",
+      "attribution": [
+        "rlm",
+        "routing"
+      ],
+      "harness": "z0int",
+      "actual_frontier_tokens": 113,
+      "baseline_frontier_tokens": null,
+      "tokens_avoided": 0,
+      "savings_tier": "unknown",
+      "verified": true
+    },
+    {
+      "trace_id": "81689e3f5f074b868758ecb50d30c0b6",
+      "measurement_level": "M2",
+      "actual_usage": "incremental",
+      "baseline": "missing",
+      "outcome": "verified",
+      "attribution": [
+        "rlm",
+        "routing"
+      ],
+      "harness": "z0int",
+      "actual_frontier_tokens": 160,
+      "baseline_frontier_tokens": null,
+      "tokens_avoided": 0,
+      "savings_tier": "unknown",
+      "verified": true
+    },
+    {
+      "trace_id": "914e8ea24c3e4fc4a577fd8a906485b4",
+      "measurement_level": "M2",
+      "actual_usage": "incremental",
+      "baseline": "missing",
+      "outcome": "verified",
+      "attribution": [
+        "rlm",
+        "routing"
+      ],
+      "harness": "z0int",
+      "actual_frontier_tokens": 103,
+      "baseline_frontier_tokens": null,
+      "tokens_avoided": 0,
+      "savings_tier": "unknown",
+      "verified": true
+    },
+    {
+      "trace_id": "a5bb61670414427c8ddc32d0d1c6fcfe",
+      "measurement_level": "M0",
+      "actual_usage": "unmetered",
+      "baseline": "missing",
+      "outcome": "negative",
+      "attribution": [
+        "rlm",
+        "routing"
+      ],
+      "harness": "z0int",
+      "actual_frontier_tokens": 0,
+      "baseline_frontier_tokens": null,
+      "tokens_avoided": 0,
+      "savings_tier": "unknown",
+      "verified": false
+    },
+    {
+      "trace_id": "a5d1ea1373694fdab388d2ce6009259a",
+      "measurement_level": "M0",
+      "actual_usage": "unmetered",
+      "baseline": "missing",
+      "outcome": "verified",
+      "attribution": [
+        "rlm",
+        "routing"
+      ],
+      "harness": "z0int",
+      "actual_frontier_tokens": 0,
+      "baseline_frontier_tokens": null,
+      "tokens_avoided": 0,
+      "savings_tier": "unknown",
+      "verified": true
+    },
+    {
+      "trace_id": "aa758f3d17ae4897bf932160ee2c0baa",
+      "measurement_level": "M2",
+      "actual_usage": "incremental",
+      "baseline": "missing",
+      "outcome": "negative",
+      "attribution": [
+        "context",
+        "omp",
+        "routing"
+      ],
+      "harness": "z0int",
+      "actual_frontier_tokens": 65,
+      "baseline_frontier_tokens": null,
+      "tokens_avoided": 0,
+      "savings_tier": "unknown",
+      "verified": false
+    },
+    {
+      "trace_id": "b52a53b96dc64b2c947d54b6b281fd56",
+      "measurement_level": "M2",
+      "actual_usage": "incremental",
+      "baseline": "missing",
+      "outcome": "negative",
+      "attribution": [
+        "rlm",
+        "routing"
+      ],
+      "harness": "z0int",
+      "actual_frontier_tokens": 175,
+      "baseline_frontier_tokens": null,
+      "tokens_avoided": 0,
+      "savings_tier": "unknown",
+      "verified": false
+    },
+    {
+      "trace_id": "b96c1a91ee004238817cfbfa308effa9",
+      "measurement_level": "M2",
+      "actual_usage": "incremental",
+      "baseline": "missing",
+      "outcome": "verified",
+      "attribution": [
+        "other",
+        "routing"
+      ],
+      "harness": "z0int",
+      "actual_frontier_tokens": 67,
+      "baseline_frontier_tokens": null,
+      "tokens_avoided": 0,
+      "savings_tier": "unknown",
+      "verified": true
+    },
+    {
+      "trace_id": "bbfdcaccb625434aa6c4f2a5dee2f596",
+      "measurement_level": "M0",
+      "actual_usage": "unmetered",
+      "baseline": "missing",
+      "outcome": "negative",
+      "attribution": [
+        "other",
+        "routing"
+      ],
+      "harness": "z0int",
+      "actual_frontier_tokens": 0,
+      "baseline_frontier_tokens": null,
+      "tokens_avoided": 0,
+      "savings_tier": "unknown",
+      "verified": false
+    },
+    {
+      "trace_id": "c3eb17ae4a374be1ba07f67e4a0764fc",
+      "measurement_level": "M2",
+      "actual_usage": "incremental",
+      "baseline": "missing",
+      "outcome": "negative",
+      "attribution": [
+        "rlm",
+        "routing"
+      ],
+      "harness": "z0int",
+      "actual_frontier_tokens": 106,
+      "baseline_frontier_tokens": null,
+      "tokens_avoided": 0,
+      "savings_tier": "unknown",
+      "verified": false
+    },
+    {
+      "trace_id": "c5aea1b19d65483ab67c0c80a98b7d54",
+      "measurement_level": "M2",
+      "actual_usage": "incremental",
+      "baseline": "missing",
+      "outcome": "verified",
+      "attribution": [
+        "other",
+        "routing"
+      ],
+      "harness": "z0int",
+      "actual_frontier_tokens": 129,
+      "baseline_frontier_tokens": null,
+      "tokens_avoided": 0,
+      "savings_tier": "unknown",
+      "verified": true
+    },
+    {
+      "trace_id": "c7b65f2d53e749dd8acdfb00414dcead",
+      "measurement_level": "M2",
+      "actual_usage": "incremental",
+      "baseline": "missing",
+      "outcome": "verified",
+      "attribution": [
+        "context",
+        "omp",
+        "routing"
+      ],
+      "harness": "z0int",
+      "actual_frontier_tokens": 146,
+      "baseline_frontier_tokens": null,
+      "tokens_avoided": 0,
+      "savings_tier": "unknown",
+      "verified": true
+    },
+    {
+      "trace_id": "c8722cbf8dbb48ee84483b1888b2e1c6",
+      "measurement_level": "M2",
+      "actual_usage": "incremental",
+      "baseline": "missing",
+      "outcome": "verified",
+      "attribution": [
+        "rlm",
+        "routing"
+      ],
+      "harness": "z0int",
+      "actual_frontier_tokens": 175,
+      "baseline_frontier_tokens": null,
+      "tokens_avoided": 0,
+      "savings_tier": "unknown",
+      "verified": true
+    },
+    {
+      "trace_id": "d360e3586a7c49a7afd63302f0d4c6f8",
+      "measurement_level": "M2",
+      "actual_usage": "incremental",
+      "baseline": "missing",
+      "outcome": "negative",
+      "attribution": [
+        "other",
+        "routing"
+      ],
+      "harness": "z0int",
+      "actual_frontier_tokens": 211,
+      "baseline_frontier_tokens": null,
+      "tokens_avoided": 0,
+      "savings_tier": "unknown",
+      "verified": false
+    },
+    {
+      "trace_id": "d898c322d5b04de08dda977e6f1805c8",
+      "measurement_level": "M0",
+      "actual_usage": "unmetered",
+      "baseline": "missing",
+      "outcome": "negative",
+      "attribution": [
+        "other",
+        "routing"
+      ],
+      "harness": "z0int",
+      "actual_frontier_tokens": 0,
+      "baseline_frontier_tokens": null,
+      "tokens_avoided": 0,
+      "savings_tier": "unknown",
+      "verified": false
+    },
+    {
+      "trace_id": "e3d2079849a947d9acfec756a8a1a25b",
+      "measurement_level": "M2",
+      "actual_usage": "incremental",
+      "baseline": "missing",
+      "outcome": "negative",
+      "attribution": [
+        "other",
+        "routing"
+      ],
+      "harness": "z0int",
+      "actual_frontier_tokens": 95,
+      "baseline_frontier_tokens": null,
+      "tokens_avoided": 0,
+      "savings_tier": "unknown",
+      "verified": false
+    },
+    {
+      "trace_id": "ea6c6438cd704c2db96102b37eccc5fe",
+      "measurement_level": "M2",
+      "actual_usage": "incremental",
+      "baseline": "missing",
+      "outcome": "negative",
+      "attribution": [
+        "context",
+        "omp",
+        "routing"
+      ],
+      "harness": "z0int",
+      "actual_frontier_tokens": 65,
+      "baseline_frontier_tokens": null,
+      "tokens_avoided": 0,
+      "savings_tier": "unknown",
+      "verified": false
+    },
+    {
+      "trace_id": "ec19e604af104fe3ab956a24f878959d",
+      "measurement_level": "M0",
+      "actual_usage": "unmetered",
+      "baseline": "missing",
+      "outcome": "verified",
+      "attribution": [
+        "other",
+        "routing"
+      ],
+      "harness": "z0int",
+      "actual_frontier_tokens": 0,
+      "baseline_frontier_tokens": null,
+      "tokens_avoided": 0,
+      "savings_tier": "unknown",
+      "verified": true
+    },
+    {
+      "trace_id": "f148c6fc663f4eca9262c52b4d3324b0",
+      "measurement_level": "M0",
+      "actual_usage": "unmetered",
+      "baseline": "missing",
+      "outcome": "negative",
+      "attribution": [
+        "other",
+        "routing"
+      ],
+      "harness": "z0int",
+      "actual_frontier_tokens": 0,
+      "baseline_frontier_tokens": null,
+      "tokens_avoided": 0,
+      "savings_tier": "unknown",
+      "verified": false
+    },
+    {
+      "trace_id": "f1549a29cafc4465b3939708745876a1",
+      "measurement_level": "M2",
+      "actual_usage": "incremental",
+      "baseline": "missing",
+      "outcome": "negative",
+      "attribution": [
+        "other",
+        "routing"
+      ],
+      "harness": "z0int",
+      "actual_frontier_tokens": 122,
+      "baseline_frontier_tokens": null,
+      "tokens_avoided": 0,
+      "savings_tier": "unknown",
+      "verified": false
+    },
+    {
+      "trace_id": "f22b0c6d9f184d9db898f4edf2bb73a7",
+      "measurement_level": "M2",
+      "actual_usage": "incremental",
+      "baseline": "missing",
+      "outcome": "verified",
+      "attribution": [
+        "other",
+        "routing"
+      ],
+      "harness": "z0int",
+      "actual_frontier_tokens": 120,
+      "baseline_frontier_tokens": null,
+      "tokens_avoided": 0,
+      "savings_tier": "unknown",
+      "verified": true
+    },
+    {
+      "trace_id": "f55f47bf578e433bad6056a3e157534e",
+      "measurement_level": "M0",
+      "actual_usage": "unmetered",
+      "baseline": "missing",
+      "outcome": "verified",
+      "attribution": [
+        "context",
+        "omp",
+        "routing"
+      ],
+      "harness": "z0int",
+      "actual_frontier_tokens": 0,
+      "baseline_frontier_tokens": null,
+      "tokens_avoided": 0,
+      "savings_tier": "unknown",
+      "verified": true
+    },
+    {
+      "trace_id": "f68c75a776904b3e817bfe5dd28905fe",
+      "measurement_level": "M2",
+      "actual_usage": "incremental",
+      "baseline": "missing",
+      "outcome": "negative",
+      "attribution": [
+        "rlm",
+        "routing"
+      ],
+      "harness": "z0int",
+      "actual_frontier_tokens": 98,
+      "baseline_frontier_tokens": null,
+      "tokens_avoided": 0,
+      "savings_tier": "unknown",
+      "verified": false
+    },
+    {
+      "trace_id": "f95c6b97647241a8a0eb63ec575438c8",
+      "measurement_level": "M2",
+      "actual_usage": "incremental",
+      "baseline": "missing",
+      "outcome": "negative",
+      "attribution": [
+        "context",
+        "omp",
+        "routing"
+      ],
+      "harness": "z0int",
+      "actual_frontier_tokens": 82,
+      "baseline_frontier_tokens": null,
+      "tokens_avoided": 0,
+      "savings_tier": "unknown",
+      "verified": false
+    }
+  ],
+  "measurement_levels": {
+    "M0": 11,
+    "M1": 0,
+    "M2": 33,
+    "M3": 0
+  },
+  "physical_usage": {
+    "incremental_provider_metered": 33,
+    "zero_local": 0,
+    "aggregate_only": 0,
+    "unmetered": 11,
+    "coverage_pct": 0.75
+  },
+  "counterfactuals": {
+    "paired_measured": 0,
+    "estimated": 0,
+    "missing": 44,
+    "coverage_pct": 0.0
+  },
+  "outcomes": {
+    "verified": 22,
+    "negative": 22,
+    "execution_only": 0,
+    "unknown": 0,
+    "verified_pct": 0.5
+  },
+  "by_mechanism": [
+    {
+      "mechanism": "routing",
+      "traces": 44,
+      "verified_traces": 22,
+      "metered_traces": 33,
+      "paired_baseline_traces": 0,
+      "estimated_baseline_traces": 0,
+      "baseline_coverage": 0.0
+    },
+    {
+      "mechanism": "other",
+      "traces": 24,
+      "verified_traces": 13,
+      "metered_traces": 18,
+      "paired_baseline_traces": 0,
+      "estimated_baseline_traces": 0,
+      "baseline_coverage": 0.0
+    },
+    {
+      "mechanism": "rlm",
+      "traces": 12,
+      "verified_traces": 6,
+      "metered_traces": 9,
+      "paired_baseline_traces": 0,
+      "estimated_baseline_traces": 0,
+      "baseline_coverage": 0.0
+    },
+    {
+      "mechanism": "context",
+      "traces": 8,
+      "verified_traces": 3,
+      "metered_traces": 6,
+      "paired_baseline_traces": 0,
+      "estimated_baseline_traces": 0,
+      "baseline_coverage": 0.0
+    },
+    {
+      "mechanism": "omp",
+      "traces": 8,
+      "verified_traces": 3,
+      "metered_traces": 6,
+      "paired_baseline_traces": 0,
+      "estimated_baseline_traces": 0,
+      "baseline_coverage": 0.0
+    }
+  ],
+  "measurement_gaps": [
+    {
+      "mechanism": "rlm",
+      "capability_id": "rlm.worker_needed",
+      "n_traces": 12,
+      "verified_traces": 6,
+      "actual_metered": true,
+      "baseline_coverage": 0.0,
+      "avg_actual_tokens": 94.4,
+      "avg_baseline_tokens": null,
+      "expected_information_value": "high",
+      "priority_score": 7931.0
+    },
+    {
+      "mechanism": "routing",
+      "capability_id": "rlm.worker_needed",
+      "n_traces": 12,
+      "verified_traces": 6,
+      "actual_metered": true,
+      "baseline_coverage": 0.0,
+      "avg_actual_tokens": 94.4,
+      "avg_baseline_tokens": null,
+      "expected_information_value": "high",
+      "priority_score": 7931.0
+    },
+    {
+      "mechanism": "other",
+      "capability_id": "tool_family_select",
+      "n_traces": 8,
+      "verified_traces": 4,
+      "actual_metered": true,
+      "baseline_coverage": 0.0,
+      "avg_actual_tokens": 114.9,
+      "avg_baseline_tokens": null,
+      "expected_information_value": "high",
+      "priority_score": 4595.0
+    },
+    {
+      "mechanism": "routing",
+      "capability_id": "tool_family_select",
+      "n_traces": 8,
+      "verified_traces": 4,
+      "actual_metered": true,
+      "baseline_coverage": 0.0,
+      "avg_actual_tokens": 114.9,
+      "avg_baseline_tokens": null,
+      "expected_information_value": "high",
+      "priority_score": 4595.0
+    },
+    {
+      "mechanism": "other",
+      "capability_id": "retry_or_escalate",
+      "n_traces": 8,
+      "verified_traces": 4,
+      "actual_metered": true,
+      "baseline_coverage": 0.0,
+      "avg_actual_tokens": 90.2,
+      "avg_baseline_tokens": null,
+      "expected_information_value": "high",
+      "priority_score": 3610.0
+    },
+    {
+      "mechanism": "routing",
+      "capability_id": "retry_or_escalate",
+      "n_traces": 8,
+      "verified_traces": 4,
+      "actual_metered": true,
+      "baseline_coverage": 0.0,
+      "avg_actual_tokens": 90.2,
+      "avg_baseline_tokens": null,
+      "expected_information_value": "high",
+      "priority_score": 3610.0
+    },
+    {
+      "mechanism": "other",
+      "capability_id": "verification_needed",
+      "n_traces": 8,
+      "verified_traces": 5,
+      "actual_metered": true,
+      "baseline_coverage": 0.0,
+      "avg_actual_tokens": 64.2,
+      "avg_baseline_tokens": null,
+      "expected_information_value": "high",
+      "priority_score": 3084.0
+    },
+    {
+      "mechanism": "routing",
+      "capability_id": "verification_needed",
+      "n_traces": 8,
+      "verified_traces": 5,
+      "actual_metered": true,
+      "baseline_coverage": 0.0,
+      "avg_actual_tokens": 64.2,
+      "avg_baseline_tokens": null,
+      "expected_information_value": "high",
+      "priority_score": 3084.0
+    },
+    {
+      "mechanism": "context",
+      "capability_id": "context_compress_needed",
+      "n_traces": 8,
+      "verified_traces": 3,
+      "actual_metered": true,
+      "baseline_coverage": 0.0,
+      "avg_actual_tokens": 73.2,
+      "avg_baseline_tokens": null,
+      "expected_information_value": "high",
+      "priority_score": 2344.0
+    },
+    {
+      "mechanism": "omp",
+      "capability_id": "context_compress_needed",
+      "n_traces": 8,
+      "verified_traces": 3,
+      "actual_metered": true,
+      "baseline_coverage": 0.0,
+      "avg_actual_tokens": 73.2,
+      "avg_baseline_tokens": null,
+      "expected_information_value": "high",
+      "priority_score": 2344.0
+    },
+    {
+      "mechanism": "routing",
+      "capability_id": "context_compress_needed",
+      "n_traces": 8,
+      "verified_traces": 3,
+      "actual_metered": true,
+      "baseline_coverage": 0.0,
+      "avg_actual_tokens": 73.2,
+      "avg_baseline_tokens": null,
+      "expected_information_value": "high",
+      "priority_score": 2344.0
+    }
+  ],
+  "flow_lane": {
+    "prepare_events": 0,
+    "net_prepare_value_ms": 0.0,
+    "speculation_overhead_ms": 0,
+    "latency_hidden_ms": 0.0,
+    "note": "Flow ms economics are a separate lane — not added to token savings."
+  },
+  "frontier_lane": {
+    "actual_frontier_tokens": 3874,
+    "measured_avoided": 0,
+    "estimated_avoided": 0,
+    "unknown_baseline_traces": 44
+  },
+  "accounting_invariant": {
+    "rule": "actual_frontier_tokens = SUM(incremental provider usage); tokens_avoided = baseline - actual per trace; mechanisms are attribution labels only.",
+    "incremental_only_for_physical_totals": true,
+    "aggregate_reconciliation_only": true
+  },
+  "savings_report_schema": "tokenomics.report.v1"
+}

@@ -434,7 +434,6 @@ export default function z0intBridge(pi: ExtensionAPI) {
 			ctx.ui?.notify?.(`z0int bridge reload error: ${e}`, "warning");
 		}
 	});
-
 	pi.on("before_agent_start", async (event, ctx) => {
 		const prompt =
 			event && typeof event === "object" && "prompt" in event
@@ -443,25 +442,33 @@ export default function z0intBridge(pi: ExtensionAPI) {
 		const sessionId = resolveSessionId(ctx);
 		if (!prompt || prompt.startsWith("/")) return;
 
-		try {
-			const h = await ensureWorker();
-			const turn: ActiveTurn = {
-				traceId: randomUUID().replaceAll("-", ""),
-				sessionId,
-				openedGeneration: h.generation,
-			};
-			activeTurn = turn;
-			await request(h, {
-				op: "turn_open",
-				trace_id: turn.traceId,
-				session_id: turn.sessionId,
-				omp_pid: process.pid,
-				payload: { prompt, session_id: turn.sessionId, omp_pid: process.pid },
-			});
-		} catch {
-			activeTurn = null;
-		}
+		// Zero-cost shadow: identity synchronously, persistence deferred
+		const turn: ActiveTurn = {
+			traceId: randomUUID().replaceAll("-", ""),
+			sessionId,
+			openedGeneration: generation,
+		};
+		activeTurn = turn;
+
+		void (async () => {
+			try {
+				const h = await ensureWorker();
+				if (turn.openedGeneration !== h.generation) {
+					turn.openedGeneration = h.generation;
+				}
+				await request(h, {
+					op: "turn_open",
+					trace_id: turn.traceId,
+					session_id: turn.sessionId,
+					omp_pid: process.pid,
+					payload: { prompt, session_id: turn.sessionId, omp_pid: process.pid },
+				});
+			} catch {
+				/* fail-open: shadow worker unavailable is not fatal */
+			}
+		})();
 	});
+
 
 	async function closeActive(messages: unknown[], source: string): Promise<void> {
 		const turn = activeTurn;
