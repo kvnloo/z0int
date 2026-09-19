@@ -123,3 +123,30 @@ Z0INT_DECIDER_DEVICE=cuda z0int backends bench --backend decider_2b --contract d
 Z0INT_LAYA_DEVICE=cpu z0int backends bench --backend decider_2b,nanojev_06b,laya_421m --contract decision-capability-v1
 ```
 
+## OpenJev adapter (`openjev_06b`)
+
+Pinned checkpoint: `Qwen/Qwen3-0.6B@c1899de289a04d12100db370d81485cdf75e47ca`.
+
+Architecture (via bundled `openjev_phase1/direct.py` scorer):
+
+- Base: `Qwen/Qwen3-0.6B` (~0.6B params), unpinned causal LM used as direct-logit substrate
+- Single-pass: one forward pass reads uppercase option-letter logits at declared answer slots
+- Prompt: chat template with JSON `{evidence, criterion, options}` user payload
+- Emits softmax-normalized option probabilities; logits preserved in `DecisionResult.diagnostics`
+- CUDA only at load time (`load_causal_model` requires exactly one visible GPU)
+- No generative decode; `usage.input_tokens` is encoder token count only
+- License: Apache-2.0 (Qwen3-0.6B base weights; commercial use OK)
+
+Cache weights:
+
+```bash
+z0int models sync --which on_demand   # includes openjev_06b
+# or: huggingface-cli download Qwen/Qwen3-0.6B --revision c1899de289a04d12100db370d81485cdf75e47ca
+```
+
+```bash
+Z0INT_LAYA_DEVICE=cpu z0int backends bench --backend openjev_06b --contract decision-capability-v1
+Z0INT_LAYA_DEVICE=cpu z0int backends bench \
+  --backend openjev_06b,decider_2b,nanojev_06b,laya_421m --contract decision-capability-v1
+```
+

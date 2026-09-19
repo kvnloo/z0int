@@ -117,12 +117,14 @@ class OpenJevDirectBackend:
         start = time.perf_counter()
         answers: list[DecisionAnswer] = []
         input_tokens = 0
+        raw_scores: dict[str, list[float]] = {}
         for q in request.questions:
             row = self._row_from_question(request, q)
             scored = self._direct_score(loaded.model, loaded.tokenizer, row, loaded.metadata)
             input_tokens += int(scored.get("input_tokens") or 0)
             probs_list = scored["probabilities"]
             option_ids = scored["option_ids"]
+            raw_scores[q.id] = [float(x) for x in scored.get("option_logits") or []]
             distribution = {oid: float(p) for oid, p in zip(option_ids, probs_list)}
             best_idx = max(range(len(probs_list)), key=probs_list.__getitem__)
             if q.type == "boolean":
@@ -149,6 +151,7 @@ class OpenJevDirectBackend:
             diagnostics={
                 "input_tokens": input_tokens,
                 "hf": self.hf,
+                "option_logits": raw_scores,
                 "readout": "native last-position logits restricted to declared answer slots",
             },
         )
