@@ -17,6 +17,7 @@ from typing import Any
 
 from z0int import paths
 from z0int.bridge import generation as gen
+from z0int.bridge.decision_cache import ResidentDecisionCache
 from z0int.bridge.protocol import (
     BRIDGE_PROTOCOL,
     SCHEMA_EVENT,
@@ -224,6 +225,8 @@ class BridgeRuntime:
         self.started_at = time.time()
         self.closing: set[str] = set()
         self.draining = False
+        # Per-generation resident DecisionBackend instances (not shared across reloads).
+        self._decision_backends = ResidentDecisionCache()
 
     def identity(self) -> dict[str, Any]:
         return {
@@ -251,7 +254,50 @@ class BridgeRuntime:
             compute_build_id()
         except Exception as exc:  # noqa: BLE001
             errors.append(f"build_id:{exc}")
-        return {"ok": not errors, "errors": errors, **self.identity()}
+        # Observational only — never load DecisionBackends here.
+        return {
+            "ok": not errors,
+            "errors": errors,
+            "decision_backends": self._decision_backends.status(),
+            **self.identity(),
+        }
+
+    def decision_status(self) -> dict[str, Any]:
+        return {
+            "ok": True,
+            "decision_backends": self._decision_backends.status(),
+            **self.identity(),
+        }
+
+    def decision_warm(self, *, backend: str) -> dict[str, Any]:
+        if self.draining:
+            return {"ok": False, "error": "draining", **self.identity()}
+        out = self._decision_backends.warm(backend)
+        out.update(self.identity())
+        return out
+
+    def decision(
+        self,
+        *,
+        backend: str,
+        request_mapping: dict[str, Any],
+        capability_id: str | None = None,
+        trace_id: str | None = None,
+    ) -> dict[str, Any]:
+        if self.draining:
+            return {"ok": False, "error": "draining", "status": "error", **self.identity()}
+        from z0int.backends.base import request_from_mapping
+
+        req = request_from_mapping(request_mapping)
+        out = self._decision_backends.evaluate(
+            backend_id=backend,
+            request=req,
+            capability_id=capability_id,
+        )
+        out.update(self.identity())
+        if trace_id:
+            out["trace_id"] = trace_id
+        return out
 
     def _maybe_quarantine(self, row: dict[str, Any], writer_generation: int | None) -> bool:
         if gen.is_stale(writer_generation):

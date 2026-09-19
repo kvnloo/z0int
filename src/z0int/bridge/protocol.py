@@ -23,6 +23,8 @@ OPS = frozenset(
         "status",
         "drain",
         "shutdown",
+        "decision",
+        "decision_warm",
     }
 )
 
@@ -83,6 +85,7 @@ def compute_build_id(root: Path | None = None) -> str:
         pass
     # always include resident sources if present
     for rel in (
+        "src/z0int/bridge/decision_cache.py",
         "src/z0int/bridge/protocol.py",
         "src/z0int/bridge/runtime.py",
         "src/z0int/bridge/worker.py",

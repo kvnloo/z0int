@@ -32,7 +32,7 @@ const Z0_ROOT =
 	process.env.Z0INT_ROOT ||
 	// Prefer the tree that owns this extension when possible.
 	process.env.Z0INT_BRIDGE_ROOT ||
-	"/home/kvn/tmp/z0int-future-integrate";
+	"/home/kvn/tmp/openjev";
 
 const WORKER_TIMEOUT_MS = Number(process.env.Z0INT_BRIDGE_TIMEOUT_MS || 45_000);
 const HANDSHAKE_TIMEOUT_MS = 20_000;
@@ -260,6 +260,8 @@ async function ensureWorker(): Promise<WorkerHandle> {
 	current = h;
 	generation = h.generation;
 	publishCurrent(h);
+	publishShadowTransport(h);
+	maybePrewarmDecider(h);
 	return h;
 }
 
@@ -302,6 +304,8 @@ async function reload(reason: string): Promise<Jsonish> {
 		current = next;
 		generation = next.generation;
 		publishCurrent(next);
+		publishShadowTransport(next);
+		maybePrewarmDecider(next);
 		if (previous) void drainAndStop(previous);
 		return {
 			ok: true,
@@ -360,6 +364,43 @@ function estimateMeasuredFromMessages(messages: unknown[]): {
 	const input_tokens = Math.floor(measured * 0.4);
 	const output_tokens = measured - input_tokens;
 	return { input_tokens, output_tokens, measured, provider, model };
+}
+
+
+type ShadowTransport = {
+	kind: "z0int-bridge";
+	request: (body: Jsonish, timeoutMs?: number) => Promise<Jsonish>;
+	warm: (backend: string) => Promise<Jsonish>;
+	generation?: number;
+	buildId?: string;
+	instanceId?: string;
+};
+
+function publishShadowTransport(h: WorkerHandle | null): void {
+	const g = globalThis as { __omp_z0int_bridge_transport__?: ShadowTransport };
+	if (!h) {
+		delete g.__omp_z0int_bridge_transport__;
+		return;
+	}
+	g.__omp_z0int_bridge_transport__ = {
+		kind: "z0int-bridge",
+		generation: h.generation,
+		buildId: h.buildId,
+		instanceId: h.instanceId,
+		request: (body, timeoutMs) => request(h, body, timeoutMs),
+		warm: (backend) =>
+			request(h, { op: "decision_warm", payload: { backend } }, 5_000),
+	};
+}
+
+function maybePrewarmDecider(h: WorkerHandle): void {
+	const env = String(process.env.OMP_SHADOW_WORKER_NEEDED || "").toLowerCase();
+	const enabled = env === "1" || env === "true" || env === "on";
+	if (!enabled) return;
+	// Non-blocking — never await during OMP startup / handshake.
+	void request(h, { op: "decision_warm", payload: { backend: "decider_2b" } }, 5_000).catch(() => {
+		/* fail-open */
+	});
 }
 
 export default function z0intBridge(pi: ExtensionAPI) {
@@ -559,4 +600,4 @@ export default function z0intBridge(pi: ExtensionAPI) {
 	});
 }
 
-export { reload, ensureWorker, BRIDGE_PROTOCOL };
+export { reload, ensureWorker, request, BRIDGE_PROTOCOL, publishShadowTransport };
