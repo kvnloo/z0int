@@ -543,6 +543,7 @@ def build_parser() -> argparse.ArgumentParser:
         ("daemon", "Run background loop (bounded iterations unless --forever)"),
         ("report", "Recent replay results"),
         ("enqueue", "Manually enqueue a verified trace"),
+        ("research-once", "P0: Tokenomics gap → ResearchDriver → fly bench → ABAB"),
     ):
         _sp = ar_sub.add_parser(_ar_name, help=_ar_help)
         _json_flag(_sp)
@@ -555,6 +556,10 @@ def build_parser() -> argparse.ArgumentParser:
             _sp.add_argument("--kind", default="context_policy", choices=["context_policy", "contrastive_evidence"])
             _sp.add_argument("--verifier-id", required=True)
             _sp.add_argument("--verified-success", type=str, default="true")
+        if _ar_name == "research-once":
+            _sp.add_argument("--driver", default="agy", choices=["agy", "deterministic"])
+            _sp.add_argument("--evolution-lab-root", default=None)
+            _sp.add_argument("--force-resources", action="store_true")
 
     kerd = sub.add_parser("kerdoios", help="Kerdoios projection helpers (receipts stay authoritative)")
     kerd_sub = kerd.add_subparsers(dest="kerdoios_cmd", required=True)
@@ -969,6 +974,18 @@ def main(argv: list[str] | None = None) -> int:
                 verified_success=True if vs else False,
                 verifier_id=args.verifier_id,
                 payload=pl,
+            )
+            _print(out, as_json=as_json)
+            return 0 if out.get("ok") else 1
+        if cmd == "research-once":
+            from pathlib import Path
+            from .autoresearch.research.pipeline import run_research_once
+            el = getattr(args, "evolution_lab_root", None)
+            out = run_research_once(
+                driver_name=str(getattr(args, "driver", "agy")),
+                evolution_lab_root=Path(el) if el else None,
+                force_resources=bool(getattr(args, "force_resources", False)),
+                skip_unit_tests=True,
             )
             _print(out, as_json=as_json)
             return 0 if out.get("ok") else 1
