@@ -13,8 +13,10 @@
  * execution remains log_only until host consume is authorized.
  */
 import { randomUUID } from "node:crypto";
-import { spawn, type ChildProcess } from "node:child_process";
-import { createInterface, type Interface } from "node:readline";
+import { spawn } from "node:child_process";
+import type { ChildProcess } from "node:child_process";
+import { createInterface } from "node:readline";
+import type { Interface } from "node:readline";
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
